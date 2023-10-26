@@ -28,6 +28,7 @@ export type CategoryData = {
   
   // Define a type for listingData
   export type ListingData = {
+    roomid: string;
     id: string;
     category: string;
     user: string;
@@ -93,6 +94,37 @@ async function getListings() {
   }
 }
 
+async function getRoomsByUserId(userId: string[]) {
+  try {
+    const roomsSnapshot = await firestore()
+      .collection('Rooms')
+      .where('userIds','array-contains-any', userId)
+      .get();
+    const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return rooms;
+  } catch (error) {
+    console.error('Error reading rooms for user IDs:', error);
+    return [];
+  }
+}
+
+async function getListingsByRoomId(roomid: string)
+{
+  try {
+    const roomsSnapshot = await firestore()
+      .collection('Listings')
+      .where('roomid','==', roomid)
+      .get();
+    const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return rooms;
+  } catch (error) {
+    console.error('Error reading listings for room ID:', error);
+    return [];
+  }
+}
+
+
+
 async function addUser(userData: UserData) {
     const userRef = firestore().collection('Users').doc();
     await userRef.set(userData);
@@ -119,24 +151,24 @@ async function addCategory(categoryData : CategoryData) {
     return listingRef.id;
   }
 
-// Example usage
-(async () => {
-  try {
-    const users = await getUsers();
-    console.log('Users:', users);
+// // Example usage
+// (async () => {
+//   try {
+//     const users = await getUsers();
+//     console.log('Users:', users);
 
-    const rooms = await getRooms();
-    console.log('Rooms:', rooms);
+//     const rooms = await getRooms();
+//     console.log('Rooms:', rooms);
 
-    const categories = await getCategories();
-    console.log('Categories:', categories);
+//     const categories = await getCategories();
+//     console.log('Categories:', categories);
 
-    const listings = await getListings();
-    console.log('Listings:', listings);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-})();
+//     const listings = await getListings();
+//     console.log('Listings:', listings);
+//   } catch (error) {
+//     console.error('Error:', error);
+//   }
+// })();
 
 export const firestoreFunctions = {
     getUsers,
@@ -147,4 +179,6 @@ export const firestoreFunctions = {
     addRoom,
     addCategory,
     addListing,
+    getListingsByRoomId,
+    getRoomsByUserId
   };

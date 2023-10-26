@@ -6,12 +6,13 @@ import { inputMockData } from './src/api/mock-data';
 
 
 function App() {
-  const handleButtonClick = () => {
-    inputMockData()
-    console.log(firestoreFunctions.getCategories())
-    console.log(firestoreFunctions.getRooms())
-    console.log(firestoreFunctions.getUsers())
-    console.log(firestoreFunctions.getListings())
+  const handleButtonClick =async () => {
+    console.log("LALALALALALA")
+const aray = await firestoreFunctions.getListingsByRoomId('11111')
+console.log(aray)
+
+
+
   };
 
   return (
@@ -30,3 +31,9 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+    // inputMockData()
+    // console.log(firestoreFunctions.getCategories())
+    // console.log(firestoreFunctions.getRooms())
+    // console.log(firestoreFunctions.getUsers())
+    // console.log(firestoreFunctions.getListings())
