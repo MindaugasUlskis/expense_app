@@ -25,7 +25,7 @@ export const  inputMockData = () => {
             color: 'blue',
             userIds: ['testtest'],
             amount: 0,
-            listingMonth: 5,
+            linstingDateCode: "202310",
           };
       
           const roomId = await firestoreFunctions.addRoom(newRoom);
@@ -51,6 +51,7 @@ export const  inputMockData = () => {
             user: 'your-user-id',
             amount: 50,
             date: '2023-10-25',
+            dateCode: '202310'
           };
       
           const listingId = await firestoreFunctions.addListing(newListing);

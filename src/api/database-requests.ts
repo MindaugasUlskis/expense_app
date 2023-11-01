@@ -1,4 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
+import { generateDateCode } from '../utils/functions/dateCodeGenerator';
+import auth from '@react-native-firebase/auth';
 
 export type RoomData = {
     name: string;
@@ -8,7 +10,7 @@ export type RoomData = {
     userIds: [string]
     amount: number
     qr?: string
-    listingMonth: number
+    linstingDateCode: string
     // Define other properties here
   };
 export type UserData = {
@@ -34,6 +36,7 @@ export type CategoryData = {
     user: string;
     amount: number;
     date: string;
+    dateCode: string;
     // Add other properties here
   };
 
@@ -150,6 +153,34 @@ async function addCategory(categoryData : CategoryData) {
     await listingRef.set(listingData);
     return listingRef.id;
   }
+  async function createRoomFromName(name: string, userId: string){
+    try {
+      const roomData: RoomData = {
+        name: name,
+        categoryId: 'your_category_id',
+        allBudget: 0,
+        color: 'orange',
+        userIds: [userId],
+        amount: 0,
+        linstingDateCode: generateDateCode(),
+      };
+  
+      const roomId = await firestoreFunctions.addRoom(roomData);
+  
+      return roomId;
+    } catch (error) {
+      console.error('Error creating room:', error);
+      throw error;
+    }
+  };
+ function getCurrentUserId (){
+    const user = auth().currentUser;
+    if (user) {
+      return user.uid;
+    }
+    console.log ('no user signed in')
+    return "null, error";
+  };
 
 // // Example usage
 // (async () => {
@@ -180,5 +211,8 @@ export const firestoreFunctions = {
     addCategory,
     addListing,
     getListingsByRoomId,
-    getRoomsByUserId
+    getRoomsByUserId,
+    createRoomFromName,
+    getCurrentUserId
   };
+
