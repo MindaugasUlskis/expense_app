@@ -1,8 +1,11 @@
 import firestore from '@react-native-firebase/firestore';
 import { generateDateCode } from '../utils/functions/dateCodeGenerator';
 import auth from '@react-native-firebase/auth';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 export type RoomData = {
+    id: string
     name: string;
     categoryId: string;
     allBudget: number;
@@ -11,7 +14,6 @@ export type RoomData = {
     amount: number
     qr?: string
     linstingDateCode: string
-    // Define other properties here
   };
 export type UserData = {
   name: string;
@@ -97,20 +99,19 @@ async function getListings() {
   }
 }
 
-async function getRoomsByUserId(userId: string[]) {
-  try {
-    const roomsSnapshot = await firestore()
-      .collection('Rooms')
-      .where('userIds','array-contains-any', userId)
-      .get();
-    const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return rooms;
-  } catch (error) {
-    console.error('Error reading rooms for user IDs:', error);
-    return [];
-  }
-}
+export async function getRoomsByUserId(userId: string): Promise<RoomData[]> {
+  const roomsCollection = firestore().collection('Rooms');
+  const querySnapshot = await roomsCollection.where('userIds','array-contains', userId).get()
+  
+  const roomsData: RoomData[] = [];
 
+  querySnapshot.forEach((documentSnapshot) => {
+    const data = documentSnapshot.data() as RoomData;
+    roomsData.push(data);
+  });
+
+  return roomsData;
+}
 async function getListingsByRoomId(roomid: string)
 {
   try {
@@ -156,6 +157,7 @@ async function addCategory(categoryData : CategoryData) {
   async function createRoomFromName(name: string, userId: string){
     try {
       const roomData: RoomData = {
+        id: uuidv4(),
         name: name,
         categoryId: 'your_category_id',
         allBudget: 0,

@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Header from '../ui/components/header';
+import MainHeader from '../ui/components/main-header';
 import TabItem from '../ui/components/tabItem';
 import RoomNameModal from '../ui/components/createRoomModal';
-import { firestoreFunctions } from '../api/database-requests';
+import { RoomData, firestoreFunctions } from '../api/database-requests';
+import Colors from '../utils/palette';
 
 function HomeScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
-  
+  const [rooms, setRooms] = useState<RoomData[]>([]);
+
+  useEffect(() => {
+    // Fetch rooms when the component mounts
+    firestoreFunctions.getRoomsByUserId(firestoreFunctions.getCurrentUserId())
+      .then((rooms) => {
+        setRooms(rooms);
+        console.log('Rooms for user', firestoreFunctions.getCurrentUserId(), ':', rooms);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }, []);
+
   const handleLogout = () => {
     // Implement your logout logic here
   };
@@ -15,40 +29,52 @@ function HomeScreen() {
   const handleSettings = () => {
     // Implement your settings logic here
   };
-  
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
   const handleCreateRoom = (roomName: string) => {
-    
-    firestoreFunctions.createRoomFromName(roomName, firestoreFunctions.getCurrentUserId())
+    firestoreFunctions.createRoomFromName(roomName, firestoreFunctions.getCurrentUserId());
   };
 
-  return (
+ return (
     <View style={styles.container}>
-     {/* <Header onLogout={handleLogout} onSettings={handleSettings} /> */}
+      <MainHeader /> 
       <ScrollView style={styles.listContainer} contentContainerStyle={styles.listContainerContent}>
-        {mockData.map((item, index) => (
-          <TabItem key={index} label={item.label} userCount={item.userCount} />
-        ))}
+        {rooms.length === 0 ? (
+          <View style={styles.emptyRoomsContainer}>
+            <TouchableOpacity style={styles.createRoomButton} onPress={toggleModal}>
+              <Text>Create a Room</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.createRoomButton} onPress={() => console.log('Join a Room')}>
+              <Text>Join a Room</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          rooms.map((item, index) => (<TabItem key={index} label={item.name} userCount={item.userIds.length} />))
+        )}
+        <View>
+          <TouchableOpacity style={styles.createRoomButton} onPress={toggleModal}>
+            <Text>Create a Room</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.createRoomButton} onPress={() => console.log('Join a Room')}>
+            <Text>Join a Room</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
       <View style={styles.createRoomContainer}>
-        <TouchableOpacity style={styles.createRoomButton}  onPress={toggleModal}>
-          <Text>Create a Room</Text>
-          
-        </TouchableOpacity>
         <RoomNameModal isVisible={isModalVisible} onClose={toggleModal} onCreateRoom={handleCreateRoom} />
       </View>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: Colors.primary
   },
   listContainer: {
     flex: 8, // 80% of available space
@@ -63,25 +89,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   createRoomButton: {
-    backgroundColor: 'blue',
+    backgroundColor: Colors.helper1,
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    marginVertical: 8,
+  },
+  emptyRoomsContainer: {
+    alignItems: 'center',
   },
 });
 
 export default HomeScreen;
-const mockData = [
-  { label: 'Tab 1', userCount: 5 },
-  { label: 'Tab 2', userCount: 7 },
-  { label: 'Tab 3', userCount: 2 },
-  { label: 'Tab 4', userCount: 8 },
-  { label: 'Tab 5', userCount: 4 },
-  { label: 'Tab 6', userCount: 6 },
-  { label: 'Tab 7', userCount: 3 },
-  { label: 'Tab 8', userCount: 9 },
-  { label: 'Tab 9', userCount: 1 },
-  { label: 'Tab 10', userCount: 0 },
-];
-

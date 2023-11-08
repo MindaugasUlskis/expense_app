@@ -15,6 +15,11 @@ const LoginScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
     loginOrRegister(email, password, navigation)
   };
 
+  const fillMockData = () => {
+    setEmail('mock@gmail.com');
+    setPassword('mock1234');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -36,6 +41,7 @@ const LoginScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
         />
       </View>
       <Button title="Login" onPress={handleLogin} />
+      <Button title="Mock" onPress={fillMockData} />
     </View>
   );
 };
