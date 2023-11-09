@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Colors from '../../utils/palette';
 
 interface TabItemProps {
   label: string;
@@ -35,12 +36,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    backgroundColor: '#E84545', // Use the specified background color
+    backgroundColor: Colors.secondary,
   },
   tabText: {
     flex: 7,
-    fontSize: 20,
-    color: 'white',
+    fontSize: Colors.fontsize2,
+    color: Colors.helper1,
   },
   rightContent: {
     flex: 3,
