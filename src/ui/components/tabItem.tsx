@@ -14,7 +14,7 @@ function TabItem({ label, userCount }: TabItemProps) {
       <Text style={styles.tabText}>{label}</Text>
       <View style={styles.rightContent}>
         <Icon name="users" size={24} color="white" />
-        <Text style={styles.userCountText}>{userCount}</Text>
+        <Text style={styles.userCountText}>  {userCount}</Text>
       </View>
     </View>
   );
@@ -22,21 +22,17 @@ function TabItem({ label, userCount }: TabItemProps) {
 
 const styles = StyleSheet.create({
   tabContainer: {
-    height: '10%', // Set a fixed height
+    height: 100, // Set a fixed height
     width: '90%',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
     marginVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignSelf:'center',
     alignItems: 'center',
     paddingHorizontal: 10,
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.primary,
+    elevation: 10
   },
   tabText: {
     flex: 7,
@@ -49,8 +45,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userCountText: {
-    fontSize: 20,
-    color: 'white',
+    fontSize: Colors.fontsize2,
+    color: Colors.helper1,
   },
 });
 

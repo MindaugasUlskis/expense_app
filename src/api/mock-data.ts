@@ -1,3 +1,4 @@
+import { generateInviteId } from "../utils/functions/invite-id-generator";
 import { firestoreFunctions, RoomData, CategoryData, ListingData } from "./database-requests";
 
 
@@ -19,6 +20,7 @@ export const  inputMockData = () => {
       
           // Example data for a new room
           const newRoom: RoomData = {
+            id: uuidv4(),
             name: 'Living Room',
             categoryId: 'your-category-id',
             allBudget: 1000,
@@ -26,6 +28,7 @@ export const  inputMockData = () => {
             userIds: ['testtest'],
             amount: 0,
             linstingDateCode: "202310",
+            inviteId: generateInviteId()
           };
       
           const roomId = await firestoreFunctions.addRoom(newRoom);
@@ -61,4 +64,8 @@ export const  inputMockData = () => {
         }
       })();
       console.log(firestoreFunctions.getRooms())
+}
+
+function uuidv4(): string {
+  throw new Error("Function not implemented.");
 }

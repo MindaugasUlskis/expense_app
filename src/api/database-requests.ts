@@ -3,6 +3,7 @@ import { generateDateCode } from '../utils/functions/dateCodeGenerator';
 import auth from '@react-native-firebase/auth';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import { generateInviteId } from '../utils/functions/invite-id-generator';
 
 export type RoomData = {
     id: string
@@ -14,6 +15,7 @@ export type RoomData = {
     amount: number
     qr?: string
     linstingDateCode: string
+    inviteId: string;
   };
 export type UserData = {
   name: string;
@@ -97,6 +99,7 @@ async function getListings() {
     console.error('Error reading listings:', error);
     return [];
   }
+
 }
 
 export async function getRoomsByUserId(userId: string): Promise<RoomData[]> {
@@ -126,6 +129,44 @@ async function getListingsByRoomId(roomid: string)
     return [];
   }
 }
+
+async function joinRoom(inviteId: string, userId: string) {
+  try {
+    // Find the room by inviteId
+    const roomQuerySnapshot = await firestore()
+      .collection('Rooms')
+      .where('inviteId', '==', inviteId)
+      .get();
+
+    // Check if the room exists
+    if (roomQuerySnapshot.size === 0) {
+      throw new Error('Room not found with the provided inviteId');
+    }
+
+    // Extract room data
+    const roomDoc = roomQuerySnapshot.docs[0];
+    const roomData = roomDoc.data() as RoomData;
+
+    // Check if the userId is already in the userids array
+    if (roomData.userIds.includes(userId)) {
+      throw new Error('User is already a member of the room');
+    }
+
+    // Update the room document by adding the userId to the userids array
+    const updatedUserIds = [...roomData.userIds, userId];
+
+    await roomDoc.ref.update({
+      userIds: updatedUserIds,
+    });
+
+    console.log('User successfully added to the room');
+  } catch (error) {
+    console.error('Error joining room:', error);
+    throw error;
+  }
+}
+
+
 
 
 
@@ -165,6 +206,7 @@ async function addCategory(categoryData : CategoryData) {
         userIds: [userId],
         amount: 0,
         linstingDateCode: generateDateCode(),
+        inviteId: generateInviteId()
       };
   
       const roomId = await firestoreFunctions.addRoom(roomData);
@@ -215,6 +257,7 @@ export const firestoreFunctions = {
     getListingsByRoomId,
     getRoomsByUserId,
     createRoomFromName,
-    getCurrentUserId
+    getCurrentUserId,
+    joinRoom
   };
 
