@@ -7,17 +7,23 @@ import { generateInviteId } from '../utils/functions/invite-id-generator';
 import { showError } from '../utils/functions/show-error';
 
 export type RoomData = {
-    id: string
-    name: string;
-    categoryId: string;
-    allBudget: number;
-    color: string;
-    userIds: [string]
-    amount: number
-    qr?: string
-    linstingDateCode: string
-    inviteId: string;
-  };
+  id: string
+  name: string;
+  categoryId: string;
+  allBudget: number;
+  color: string;
+  userIds: [string]
+  amount: number
+  qr?: string
+  linstingDateCode: string
+  inviteId: string;
+};
+export type OldRoomData = {
+  id: string
+  allBudget: number;
+  amount: number
+  linstingDateCode: string
+};
 export type UserData = {
   name: string;
   password: string;
@@ -25,25 +31,25 @@ export type UserData = {
   // Add other properties here
 };
 export type CategoryData = {
-    name: string;
-    id: string;
-    budget: number;
-    color: string;
-    amount: number;
-    // Add other properties here
-  };
-  
-  // Define a type for listingData
-  export type ListingData = {
-    roomid: string;
-    id: string;
-    category: string;
-    user: string;
-    amount: number;
-    date: string;
-    dateCode: string;
-    // Add other properties here
-  };
+  name: string;
+  id: string;
+  budget: number;
+  color: string;
+  amount: number;
+  // Add other properties here
+};
+
+// Define a type for listingData
+export type ListingData = {
+  roomid: string;
+  id: string;
+  category: string;
+  user: string;
+  amount: number;
+  date: string;
+  dateCode: string;
+  // Add other properties here
+};
 
 
 // Function to read all users from Firestore
@@ -105,8 +111,8 @@ async function getListings() {
 
 export async function getRoomsByUserId(userId: string): Promise<RoomData[]> {
   const roomsCollection = firestore().collection('Rooms');
-  const querySnapshot = await roomsCollection.where('userIds','array-contains', userId).get()
-  
+  const querySnapshot = await roomsCollection.where('userIds', 'array-contains', userId).get()
+
   const roomsData: RoomData[] = [];
 
   querySnapshot.forEach((documentSnapshot) => {
@@ -116,12 +122,11 @@ export async function getRoomsByUserId(userId: string): Promise<RoomData[]> {
 
   return roomsData;
 }
-async function getListingsByRoomId(roomid: string)
-{
+async function getListingsByRoomId(roomid: string) {
   try {
     const roomsSnapshot = await firestore()
       .collection('Listings')
-      .where('roomid','==', roomid)
+      .where('roomid', '==', roomid)
       .get();
     const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return rooms;
@@ -173,61 +178,164 @@ async function joinRoom(inviteId: string, userId: string) {
 
 
 async function addUser(userData: UserData) {
-    const userRef = firestore().collection('Users').doc();
-    await userRef.set(userData);
-    return userRef.id;
-  }
-  
-  // Function to add a new room to Firestore
- async function addRoom(roomData: RoomData) {
-    const roomRef = firestore().collection('Rooms').doc();
-    await roomRef.set(roomData);
-    return roomRef.id;
-  }
-  // Function to add a new category to Firestore
-async function addCategory(categoryData : CategoryData) {
-    const categoryRef = firestore().collection('Categories').doc();
-    await categoryRef.set(categoryData);
-    return categoryRef.id;
-  }
-  
-  // Function to add a new listing to Firestore                             
- async function addListing(listingData : ListingData) {
-    const listingRef = firestore().collection('Listings').doc();
-    await listingRef.set(listingData);
-    return listingRef.id;
-  }
-  async function createRoomFromName(name: string, userId: string){
-    try {
-      const roomData: RoomData = {
-        id: uuidv4(),
-        name: name,
-        categoryId: 'your_category_id',
-        allBudget: 0,
-        color: 'orange',
-        userIds: [userId],
-        amount: 0,
-        linstingDateCode: generateDateCode(),
-        inviteId: generateInviteId()
-      };
-  
-      const roomId = await firestoreFunctions.addRoom(roomData);
-  
-      return roomId;
-    } catch (error) {
-      console.error('Error creating room:', error);
-      throw error;
-    }
-  };
- function getCurrentUserId (){
-    const user = auth().currentUser;
-    if (user) {
-      return user.uid;
-    }
-    console.log ('no user signed in')
-    return "null, error";
-  };
+  const userRef = firestore().collection('Users').doc();
+  await userRef.set(userData);
+  return userRef.id;
+}
 
+// Function to add a new room to Firestore
+async function addRoom(roomData: RoomData) {
+  const roomRef = firestore().collection('Rooms').doc();
+  await roomRef.set(roomData);
+  return roomRef.id;
+}
+async function addOldRoom(roomData: OldRoomData) {
+  const roomRef = firestore().collection('OldRooms').doc();
+  await roomRef.set(roomData);
+  return roomRef.id;
+}
+// Function to add a new category to Firestore
+async function addCategory(categoryData: CategoryData) {
+  const categoryRef = firestore().collection('Categories').doc();
+  await categoryRef.set(categoryData);
+  return categoryRef.id;
+}
+
+// Function to add a new listing to Firestore                             
+async function addListing(listingData: ListingData) {
+  const listingRef = firestore().collection('Listings').doc();
+  await listingRef.set(listingData);
+  return listingRef.id;
+}
+async function createRoomFromName(name: string, userId: string) {
+  try {
+    const roomData: RoomData = {
+      id: uuidv4(),
+      name: name,
+      categoryId: 'your_category_id',
+      allBudget: 0,
+      color: 'orange',
+      userIds: [userId],
+      amount: 0,
+      linstingDateCode: generateDateCode(),
+      inviteId: generateInviteId()
+    };
+
+    const roomId = await firestoreFunctions.addRoom(roomData);
+
+    return roomId;
+  } catch (error) {
+    console.error('Error creating room:', error);
+    throw error;
+  }
+};
+async function createOldRoomFromRoomData(room: RoomData) {
+  try {
+    const oldRoomData: OldRoomData = {
+      id: room.id,
+      allBudget: room.allBudget,
+      amount: room.amount,
+      linstingDateCode: room.linstingDateCode,
+    };
+    const roomId = await firestoreFunctions.addOldRoom(oldRoomData);
+    return roomId;
+  } catch (error) {
+    console.error('Error creating room:', error);
+    throw error;
+  }
+};
+function getCurrentUserId() {
+  const user = auth().currentUser;
+  if (user) {
+    return user.uid;
+  }
+  console.log('no user signed in')
+  return "null, error";
+};
+
+async function updateRoomData(item: RoomData) {
+  try {
+    const updatedRoomData = {
+      id: item.id,
+      name: item.name,
+      categoryId: item.categoryId,
+      allBudget: 0,
+      color: item.color,
+      userIds: item.userIds,
+      amount: 0,
+      qr: item.qr || '',
+      linstingDateCode: generateDateCode(),
+      inviteId: item.inviteId,
+    };
+
+    const roomQuerySnapshot = await firestore()
+      .collection('Rooms')
+      .where('id', '==', item.id)
+      .get();
+
+    if (roomQuerySnapshot.docs.length > 0) {
+      const roomDoc = roomQuerySnapshot.docs[0];
+      await roomDoc.ref.update(updatedRoomData);
+      console.log('Room data updated successfully');
+    } else {
+      console.log('No room found for the given ID');
+    }
+  } catch (error) {
+    showError(`Error updating room data: ${error}`);
+  }
+}
+async function getListingDateCodeByRoomId(roomId: string): Promise<string> {
+  try {
+    const roomQuerySnapshot = await firestore()
+      .collection('Rooms')
+      .where('id', '==', roomId)
+      .get();
+
+
+    const roomData = roomQuerySnapshot.docs[0].data() as RoomData;
+    const listingDateCode = roomData.linstingDateCode;
+
+    if (listingDateCode === null) {
+      showError('Listing Date Code is null');
+      return 'error if it\'s null';
+    }
+
+    return listingDateCode;
+  } catch (error) {
+    showError(`Error fetching listingDateCode for room ID: ${error}`);
+    return 'error if it\'s null';
+  }
+}
+async function getRoomByRoomId(roomId: string): Promise<RoomData>{
+  const roomQuerySnapshot = await firestore()
+  .collection('Rooms')
+  .where('id', '==', roomId)
+  .get();
+
+  const roomData = roomQuerySnapshot.docs[0].data() as RoomData;
+
+  return roomData
+}
+
+async function createListing(amount: number, userId: string, category: string, roomId: string): Promise<string> {
+  try {
+    
+    const listingData: ListingData = {
+      roomid: roomId,
+      id: uuidv4(),
+      category: category,
+      user: userId,
+      amount: amount,
+      date: new Date().toISOString(),
+      dateCode: generateDateCode(),
+    };
+    const listingId = await firestoreFunctions.addListing(listingData);
+    return listingId;
+  } catch (error) {
+    showError(`Error updating room data: ${error}`);
+    return 'error in creation of listing'
+  }
+}
 // // Example usage
 // (async () => {
 //   try {
@@ -248,18 +356,24 @@ async function addCategory(categoryData : CategoryData) {
 // })();
 
 export const firestoreFunctions = {
-    getUsers,
-    getRooms,
-    getCategories,
-    getListings,
-    addUser,
-    addRoom,
-    addCategory,
-    addListing,
-    getListingsByRoomId,
-    getRoomsByUserId,
-    createRoomFromName,
-    getCurrentUserId,
-    joinRoom
-  };
+  getUsers,
+  getRooms,
+  getCategories,
+  getListings,
+  addUser,
+  addRoom,
+  addCategory,
+  addListing,
+  getListingsByRoomId,
+  getRoomsByUserId,
+  createRoomFromName,
+  getCurrentUserId,
+  joinRoom,
+  addOldRoom,
+  createOldRoomFromRoomData,
+  updateRoomData,
+  getListingDateCodeByRoomId,
+  getRoomByRoomId,
+  createListing,
+};
 

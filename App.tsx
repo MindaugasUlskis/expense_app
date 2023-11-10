@@ -1,8 +1,5 @@
 import React from 'react';
-import { View, Button, Alert, StyleSheet } from 'react-native';
 import { firestoreFunctions } from './src/api/database-requests';
-import { UserData, RoomData, CategoryData, ListingData } from './src/api/database-requests';
-import { inputMockData } from './src/api/mock-data';
 import { generateDateCode } from './src/utils/functions/dateCodeGenerator';
 import { getMonthName } from './src/utils/functions/monthNumberToWord';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,6 +8,7 @@ import HomeScreen from './src/screens/home-screen';
 import LoginScreen from './src/screens/login-screens';
 import  Toast  from 'react-native-toast-message';
 import RoomScreen from './src/screens/room-screen';
+import { StyleSheet } from 'react-native';
 
 const Stack = createStackNavigator();
 function App() {
@@ -74,9 +72,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-// inputMockData()
-// console.log(firestoreFunctions.getCategories())
-// console.log(firestoreFunctions.getRooms())
-// console.log(firestoreFunctions.getUsers())
-// console.log(firestoreFunctions.getListings())
