@@ -7,8 +7,12 @@ import { RoomData, firestoreFunctions } from '../api/database-requests';
 import Colors from '../utils/palette';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import JoinRoomModal from '../ui/components/joinRoomModalProps';
+import { RootStackParamList } from './rootStackParamList';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-function HomeScreen() {
+type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Room'>;
+const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
+
   const [isCreateRoomModalVisible, setCreateRoomModalVisible] = useState(false);;
   const [isJoinRoomModalVisible, setJoinRoomModalVisible] = useState(false);
   const [rooms, setRooms] = useState<RoomData[]>([]);
@@ -59,6 +63,10 @@ function HomeScreen() {
     }
     fetchRooms();
   };
+
+  const handleNavigation =(item: RoomData) =>{
+    navigation.navigate('Room', {item})
+  }
   const renderButtons = () => (
     <View style={styles.createRoomContainer}>
       <TouchableOpacity style={styles.squareButton} onPress={toggleCreateRoomModal}>
@@ -82,7 +90,7 @@ function HomeScreen() {
             </View>
           ) : (
             rooms.map((item, index) => (
-              <TabItem key={index} label={item.name} userCount={item.userIds.length} />
+              <TabItem key={index} label={item.name} userCount={item.userIds.length} onClick={() => handleNavigation(item)}/>
             ))
           )}
         </ScrollView>

@@ -6,10 +6,12 @@ import Colors from '../../utils/palette';
 interface TabItemProps {
   label: string;
   userCount: number;
+  onClick: () => void;
 }
 
-function TabItem({ label, userCount }: TabItemProps) {
+function TabItem({ label, userCount,onClick}: TabItemProps) {
   return (
+    <TouchableOpacity onPress={onClick}> 
     <View style={styles.tabContainer}>
       <Text style={styles.tabText}>{label}</Text>
       <View style={styles.rightContent}>
@@ -17,6 +19,7 @@ function TabItem({ label, userCount }: TabItemProps) {
         <Text style={styles.userCountText}>  {userCount}</Text>
       </View>
     </View>
+    </TouchableOpacity>
   );
 }
 

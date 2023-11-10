@@ -10,6 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from './src/screens/home-screen';
 import LoginScreen from './src/screens/login-screens';
 import  Toast  from 'react-native-toast-message';
+import RoomScreen from './src/screens/room-screen';
 
 const Stack = createStackNavigator();
 function App() {
@@ -50,6 +51,11 @@ function App() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
+          options={{ headerShown: false }} // Hide header for LoginScreen
+        />
+        <Stack.Screen
+          name="Room"
+          component={RoomScreen}
           options={{ headerShown: false }} // Hide header for LoginScreen
         />
       </Stack.Navigator>
