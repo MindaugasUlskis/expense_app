@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from './src/screens/home-screen';
 import LoginScreen from './src/screens/login-screens';
+import  Toast  from 'react-native-toast-message';
 
 const Stack = createStackNavigator();
 function App() {
@@ -38,6 +39,7 @@ function App() {
   };
 
   return (
+    <>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
@@ -52,6 +54,8 @@ function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    <Toast />
+    </>
   );
 }
 

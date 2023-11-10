@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInviteId } from '../utils/functions/invite-id-generator';
+import { showError } from '../utils/functions/show-error';
 
 export type RoomData = {
     id: string
@@ -54,7 +55,7 @@ async function getUsers() {
     const users = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return users;
   } catch (error) {
-    console.error('Error reading users:', error);
+    showError('Error reading users')
     return [];
   }
 }
@@ -68,7 +69,7 @@ async function getRooms() {
     const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return rooms;
   } catch (error) {
-    console.error('Error reading rooms:', error);
+    showError('Error reading rooms')
     return [];
   }
 }
@@ -82,7 +83,7 @@ async function getCategories() {
     const categories = categoriesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return categories;
   } catch (error) {
-    console.error('Error reading categories:', error);
+    showError('Error reading categories')
     return [];
   }
 }
@@ -96,7 +97,7 @@ async function getListings() {
     const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return listings;
   } catch (error) {
-    console.error('Error reading listings:', error);
+    showError('Error reading listings')
     return [];
   }
 
@@ -125,7 +126,7 @@ async function getListingsByRoomId(roomid: string)
     const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return rooms;
   } catch (error) {
-    console.error('Error reading listings for room ID:', error);
+    showError('Error reading listings for room ID')
     return [];
   }
 }
@@ -140,6 +141,7 @@ async function joinRoom(inviteId: string, userId: string) {
 
     // Check if the room exists
     if (roomQuerySnapshot.size === 0) {
+      showError('Room not found with the provided inviteId')
       throw new Error('Room not found with the provided inviteId');
     }
 
@@ -149,6 +151,7 @@ async function joinRoom(inviteId: string, userId: string) {
 
     // Check if the userId is already in the userids array
     if (roomData.userIds.includes(userId)) {
+      showError('User is already a member of the room')
       throw new Error('User is already a member of the room');
     }
 
@@ -161,8 +164,7 @@ async function joinRoom(inviteId: string, userId: string) {
 
     console.log('User successfully added to the room');
   } catch (error) {
-    console.error('Error joining room:', error);
-    throw error;
+    showError(`${error}`)
   }
 }
 
