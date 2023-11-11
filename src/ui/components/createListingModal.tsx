@@ -7,7 +7,7 @@ import { firestoreFunctions } from '../../api/database-requests'
 interface CreateListingModalProps {
     isVisible: boolean;
     onClose: () => void;
-    onCreateListing: (number: number, category: string, roomId: string, userId: string) => void;
+    onCreateListing: (number: number, category: string, userId: string ,roomId: string,) => void;
     categories: string[]; // List of available categories
     item: RoomData
 }
@@ -29,7 +29,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isVisible, onCl
     };
     const handleCreateListing = () => {
         if (!isNaN(number) && selectedCategory && number !== 0) {
-            onCreateListing(number, selectedCategory, item.id, firestoreFunctions.getCurrentUserId());
+            onCreateListing(number, selectedCategory, firestoreFunctions.getCurrentUserId(),  item.id,);
             setNumber(0); // Set the input field back to 0
             onClose();
         } else {

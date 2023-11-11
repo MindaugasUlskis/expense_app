@@ -135,6 +135,21 @@ async function getListingsByRoomId(roomid: string) {
     return [];
   }
 }
+async function getListingsByRoomIdAndDateCode(roomid: string, datecode: string): Promise<ListingData[]> {
+  try {
+    const listingsSnapshot = await firestore()
+      .collection('Listings')
+      .where('roomid', '==', roomid)
+      .where('dateCode', '==',datecode )
+      .get();
+      console.log(listingsSnapshot.docs)
+    const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ListingData[];
+    return listings;
+  } catch (error) {
+    showError('Error reading listings for room ID and date code');
+    return [];
+  }
+}
 
 async function joinRoom(inviteId: string, userId: string) {
   try {
@@ -374,6 +389,7 @@ export const firestoreFunctions = {
   updateRoomData,
   getListingDateCodeByRoomId,
   getRoomByRoomId,
+  getListingsByRoomIdAndDateCode,
   createListing,
 };
 

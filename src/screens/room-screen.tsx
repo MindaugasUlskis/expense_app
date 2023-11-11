@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'rea
 import { RootStackParamList } from './rootStackParamList';
 import { RouteProp } from '@react-navigation/native';
 import { generateDateCode } from '../utils/functions/dateCodeGenerator';
-import { firestoreFunctions } from '../api/database-requests';
+import { ListingData, firestoreFunctions } from '../api/database-requests';
 import ExpenseRoomHeader from '../ui/components/expense-room-header';
 import Colors from '../utils/palette';
 import SplitNumberDisplay from '../ui/components/split-number-display';
@@ -16,13 +16,30 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
     const [isCreateRoomModalVisible, setCreateRoomModalVisible] = useState(false);;
     const [item, setItem] = useState(route.params?.item);
     const currentDateCode = generateDateCode();
+    const [listings, setListings] = useState<ListingData[]>([]);
 
-    
+    const fetchListings = async () => {
+      try {
+        const roomID = item.id;
+        const dateCode = item.linstingDateCode;
+  
+        const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
+  
+        // Use the fetched listings
+        setListings(fetchedListings);
+        console.log('fetched listings')
+        console.log(`listing count ${fetchedListings.length}`)
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      }
+    };
+
+
   const toggleCreateAListing = () => {
     setCreateRoomModalVisible(!isCreateRoomModalVisible);
   };
 
-  const handleCreateListing = async (amount: number, userId: string, category: string, roomId: string  ) => {
+  const handleCreateListing = async (amount: number, category: string, userId: string, roomId: string  ) => {
     try {
      firestoreFunctions.createListing(amount, userId, category, roomId)
     } catch (error) {
@@ -38,10 +55,12 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
                 await firestoreFunctions.updateRoomData(item);
                 const updatedItem = await firestoreFunctions.getRoomByRoomId(item.id);
                 setItem(updatedItem);
+                fetchListings();
             }
         }
 
         fetchData();
+        fetchListings();
     }, [item]);
     const renderButtons = () => (
         <View style={styles.createRoomContainer}>
@@ -55,6 +74,9 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
         <View style={styles.container}>
             <ExpenseRoomHeader text={item.name} renderButtons={renderButtons}/>
             <SplitNumberDisplay leftNumber={2550} rightNumber={3500}></SplitNumberDisplay>
+            {listings.map((listing) => (
+  <Text key={listing.id}>{listing.amount}</Text>
+))}
             <CreateListingModal isVisible={isCreateRoomModalVisible} onClose={toggleCreateAListing} onCreateListing={handleCreateListing} categories={['Car', 'Bills', 'Groceries', ]} item={item} />
         </View>
     );
