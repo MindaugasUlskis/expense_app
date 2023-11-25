@@ -51,6 +51,23 @@ export type ListingData = {
   // Add other properties here
 };
 
+const deleteDocumentByIdAttribute = async (docId: string, collection: string) => {
+  try {
+    const collectionRef = firestore().collection(collection);
+
+    const querySnapshot = await collectionRef.where('id', '==', docId).get();
+    if (querySnapshot.docs.length === 0) {
+      console.warn(`Document with ID ${docId} not found`);
+      return;
+    }
+    const docRef = querySnapshot.docs[0].ref;
+    await docRef.delete();
+
+    console.log(`Document with ID ${docId} deleted successfully`);
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+};
 
 // Function to read all users from Firestore
 async function getUsers() {
@@ -140,10 +157,11 @@ async function getListingsByRoomIdAndDateCode(roomid: string, datecode: string):
     const listingsSnapshot = await firestore()
       .collection('Listings')
       .where('roomid', '==', roomid)
-      .where('dateCode', '==',datecode )
+      .where('dateCode', '==',datecode)
       .get();
       console.log(listingsSnapshot.docs)
     const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ListingData[];
+    listings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return listings;
   } catch (error) {
     showError('Error reading listings for room ID and date code');
@@ -391,5 +409,6 @@ export const firestoreFunctions = {
   getRoomByRoomId,
   getListingsByRoomIdAndDateCode,
   createListing,
+  deleteDocumentByIdAttribute,
 };
 

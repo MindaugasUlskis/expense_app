@@ -11,13 +11,20 @@ const SplitNumberDisplay: React.FC<ComponentProps> = ({ leftNumber, rightNumber 
   return (
     <View style={styles.container}>
       <View style={styles.labelContainer}>
-        <Text style={styles.label}>Expenses</Text>
-        <Text style={styles.label}>Budget</Text>
+
+
       </View>
       <View style={styles.row}>
-        <Text style={styles.number}>{leftNumber}</Text>
+        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+          <Text style={styles.label}>Expenses</Text>
+          <Text style={styles.number}>{leftNumber}</Text>
+        </View>
+
         <View style={styles.lineVertical}></View>
-        <Text style={styles.number}>{rightNumber}</Text>
+        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+          <Text style={styles.label}>Budget</Text>
+          <Text style={styles.number}>{rightNumber}</Text>
+        </View>
       </View>
       <View style={styles.lineHorizontal}></View>
     </View>
