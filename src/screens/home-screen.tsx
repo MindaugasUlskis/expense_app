@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
 import MainHeader from '../ui/components/main-header';
 import TabItem from '../ui/components/tabItem';
@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import JoinRoomModal from '../ui/components/joinRoomModalProps';
 import { RootStackParamList } from './rootStackParamList';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useFocusEffect } from '@react-navigation/native';
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Room'>;
 const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
@@ -22,6 +23,11 @@ const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
     // Fetch rooms when the component mounts
     fetchRooms();
   }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchRooms();
+    }, [])
+  );
 
 
   const fetchRooms = () => {

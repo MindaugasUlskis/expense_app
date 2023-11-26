@@ -10,24 +10,30 @@ import SplitNumberDisplay from '../ui/components/split-number-display';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CreateListingModal from '../ui/components/createListingModal';
 import ListingItem from '../ui/components/listing-tab-item';
-
+import RoomSettingsModal from '../ui/components/roomSettingsModal';
+import { StackNavigationProp } from '@react-navigation/stack';
+type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type RoomScreenRouteProp = RouteProp<RootStackParamList, 'Room'>;
 
-const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
+const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  navigation: ScreenNavigationProp  }) => {
     const [isCreateRoomModalVisible, setCreateRoomModalVisible] = useState(false);;
+    const [isRoomSettingsModalVisible, setRoomSettingsModalVisible] = useState(false);;
     const [item, setItem] = useState(route.params?.item);
     const currentDateCode = generateDateCode();
     const [listings, setListings] = useState<ListingData[]>([]);
-
+    const [currentBudget, setCurrentBudget] = useState(0);
+    const [currentExpenses, setCurrentExpenses] = useState(0);
     const fetchListings = async () => {
       try {
         const roomID = item.id;
         const dateCode = item.linstingDateCode;
   
         const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
-  
-        // Use the fetched listings
+        const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
         setListings(fetchedListings);
+        setCurrentExpenses(totalAmount)
+        console.log(`Total amount: ${totalAmount}`);
+
         console.log('fetched listings')
         console.log(`listing count ${fetchedListings.length}`)
       } catch (error) {
@@ -38,6 +44,9 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
 
   const toggleCreateAListing = () => {
     setCreateRoomModalVisible(!isCreateRoomModalVisible);
+  };
+  const toggleRoomSettings = () => {
+    setRoomSettingsModalVisible(!isRoomSettingsModalVisible);
   };
 
   const handleCreateListing = async (amount: number, category: string, userId: string, roomId: string  ) => {
@@ -57,6 +66,27 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
      }
      fetchListings();
   };
+  const  handleBudgetChange = async (budget: number) => {
+    try {
+      firestoreFunctions.updateDocumentBudgetByIdAttribute(item.id, budget, 'Rooms')
+      item.allBudget = budget
+      toggleRoomSettings()
+     } catch (error) {
+       console.error('Error removing listing:', error);
+     }
+     
+  };
+  const  handleUserLeave = async () => {
+    try {
+      firestoreFunctions.updateUserArrayInRoom(item.id, firestoreFunctions.getCurrentUserId())
+      navigation.navigate('Home')
+
+     } catch (error) {
+       console.error('Error while leaving the room:', error);
+     }
+     
+  };
+
 
     useEffect(() => {
         async function fetchData() {
@@ -75,16 +105,16 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
     }, [item]);
     const renderButtons = () => (
         <View style={styles.createRoomContainer}>
-          <TouchableOpacity style={styles.squareButton} onPress={toggleCreateAListing}>
+          <TouchableOpacity style={styles.squareButton} onPress={toggleRoomSettings}>
             <Icon name="cog" size={30} color={Colors.helper1} />
           </TouchableOpacity>
         </View>
       );
 
       return (
-        <View style={styles.container}>
+        <View style={styles.container}> 
           <ExpenseRoomHeader text={item.name} renderButtons={renderButtons} />
-          <SplitNumberDisplay leftNumber={2550} rightNumber={3500} />
+          <SplitNumberDisplay leftNumber={currentExpenses} rightNumber={item.allBudget} />
           <ScrollView style={{ paddingTop: 10, flex: 1, maxHeight:'75%' }}>
             <View style={styles.listContainer}>
               {listings.map((listing) => (
@@ -103,6 +133,13 @@ const RoomScreen = ({ route }: { route: RoomScreenRouteProp }) => {
             onCreateListing={handleCreateListing}
             categories={['Car', 'Bills', 'Groceries']}
             item={item}
+          />
+           <RoomSettingsModal
+            isVisible={isRoomSettingsModalVisible}
+            onClose={toggleRoomSettings}
+            onLeave={handleUserLeave}
+            onbudgetChange={handleBudgetChange}
+            currentBudget={item.allBudget}
           />
         </View>
       );

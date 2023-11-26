@@ -28,7 +28,6 @@ export type UserData = {
   name: string;
   password: string;
   nock: string;
-  // Add other properties here
 };
 export type CategoryData = {
   name: string;
@@ -36,10 +35,8 @@ export type CategoryData = {
   budget: number;
   color: string;
   amount: number;
-  // Add other properties here
 };
 
-// Define a type for listingData
 export type ListingData = {
   roomid: string;
   id: string;
@@ -48,7 +45,6 @@ export type ListingData = {
   amount: number;
   date: string;
   dateCode: string;
-  // Add other properties here
 };
 
 const deleteDocumentByIdAttribute = async (docId: string, collection: string) => {
@@ -66,6 +62,49 @@ const deleteDocumentByIdAttribute = async (docId: string, collection: string) =>
     console.log(`Document with ID ${docId} deleted successfully`);
   } catch (error) {
     console.error('Error deleting document:', error);
+  }
+};
+const updateDocumentBudgetByIdAttribute = async (docId: string, newBudget: number, collection: string) => {
+  try {
+    const collectionRef = firestore().collection(collection);
+    const querySnapshot = await collectionRef.where('id', '==', docId).get();
+
+    if (querySnapshot.docs.length === 0) {
+      console.warn(`Document with ID ${docId} not found`);
+      return;
+    }
+    const docRef = querySnapshot.docs[0].ref;
+    await docRef.update({
+      budget: newBudget,
+    });
+
+    console.log(`Budget for document with ID ${docId} updated successfully`);
+  } catch (error) {
+    console.error('Error updating document:', error);
+  }
+};
+const updateUserArrayInRoom = async (roomId: string, userIdToRemove: string) => {
+  try {
+    const collectionRef = firestore().collection("Rooms");
+    const querySnapshot = await collectionRef.where('id', '==', roomId).get();
+
+    if (querySnapshot.docs.length === 0) {
+      console.warn(`Room with ID ${roomId} not found`);
+      return;
+    }
+
+    const roomDoc = querySnapshot.docs[0];
+    const currentUsers = roomDoc.data()?.userIds || [];
+
+    const updatedUsers = currentUsers.filter((userId: string) => userId !== userIdToRemove);
+
+    await roomDoc.ref.update({
+      userIds: updatedUsers,
+    });
+
+    console.log(`User with ID ${userIdToRemove} removed from room with ID ${roomId}`);
+  } catch (error) {
+    console.error('Error updating users array in room:', error);
   }
 };
 
@@ -410,5 +449,7 @@ export const firestoreFunctions = {
   getListingsByRoomIdAndDateCode,
   createListing,
   deleteDocumentByIdAttribute,
+  updateDocumentBudgetByIdAttribute,
+  updateUserArrayInRoom,
 };
 
