@@ -12,6 +12,7 @@ import CreateListingModal from '../ui/components/createListingModal';
 import ListingItem from '../ui/components/listing-tab-item';
 import RoomSettingsModal from '../ui/components/roomSettingsModal';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { calculateBudgetWastedPercentage, calculatePercentageSpent, calculateTotalAmountByCategory, calculateTotalAmountByUser } from '../utils/functions/calculateChardData';
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type RoomScreenRouteProp = RouteProp<RootStackParamList, 'Room'>;
 
@@ -80,11 +81,13 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
     try {
       firestoreFunctions.updateUserArrayInRoom(item.id, firestoreFunctions.getCurrentUserId())
       navigation.navigate('Home')
-
      } catch (error) {
        console.error('Error while leaving the room:', error);
      }
-     
+    
+  };
+  const  handleOverview = async () => {
+    navigation.navigate('Overview', {item, listings, currentExpenses })
   };
 
 
@@ -123,6 +126,9 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
             </View>
           </ScrollView>
           <View style={styles.centeredButtonContainer} >
+          <TouchableOpacity style={styles.squareButton} onPress={handleOverview}>
+            <Icon name="minus" size={30} color={Colors.helper1} />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.squareButton} onPress={toggleCreateAListing}>
             <Icon name="plus" size={30} color={Colors.helper1} />
           </TouchableOpacity>

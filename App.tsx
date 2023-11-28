@@ -9,34 +9,10 @@ import LoginScreen from './src/screens/login-screens';
 import  Toast  from 'react-native-toast-message';
 import RoomScreen from './src/screens/room-screen';
 import { StyleSheet } from 'react-native';
+import OverviewScreen from './src/screens/overview-screen';
 
 const Stack = createStackNavigator();
 function App() {
-  const handleButtonClick = async () => {
-    console.log("LALALALALALA")
-    const aray = await firestoreFunctions.getListingsByRoomId('11111')
-
-    console.log(aray)
-
-
-    const currentDate = new Date()
-    console.log(currentDate)
-    console.log(currentDate.toLocaleTimeString())
-    console.log(currentDate.toLocaleDateString())
-
-    console.log("LALALALALALA")
-    console.log(generateDateCode())
-    console.log("LALALALALALA")
-    console.log(getMonthName(1))
-    console.log(getMonthName(2))
-    console.log(getMonthName(3))
-    console.log(getMonthName(4))
-    console.log(getMonthName(5))
-    console.log(getMonthName(7))
-    console.log(getMonthName(12, false))
-
-  };
-
   return (
     <>
     <NavigationContainer>
@@ -54,6 +30,11 @@ function App() {
         <Stack.Screen
           name="Room"
           component={RoomScreen}
+          options={{ headerShown: false }} // Hide header for LoginScreen
+        />
+        <Stack.Screen
+          name="Overview"
+          component={OverviewScreen}
           options={{ headerShown: false }} // Hide header for LoginScreen
         />
       </Stack.Navigator>
