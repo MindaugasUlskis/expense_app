@@ -408,6 +408,45 @@ async function createListing(amount: number, userId: string, category: string, r
     return 'error in creation of listing'
   }
 }
+async function getOldRoomsByRoomId(roomId: string): Promise<OldRoomData[]> {
+  try {
+    const oldRoomsSnapshot = await firestore()
+      .collection('OldRooms')
+      .where('id', '==', roomId)
+      .get();
+
+    const oldRoomsData: OldRoomData[] = [];
+
+    oldRoomsSnapshot.forEach((documentSnapshot) => {
+      const data = documentSnapshot.data() as OldRoomData;
+      oldRoomsData.push(data);
+    });
+    oldRoomsData.sort((a, b) => parseInt(a.linstingDateCode) - parseInt(b.linstingDateCode));
+    return oldRoomsData;
+  } catch (error) {
+    showError(`Error reading old rooms for room ID: ${error}`);
+    return [];
+  }
+}
+
+const loadAllRooms = async (item : RoomData) => {
+  try {
+    const oldRooms: OldRoomData[] = await firestoreFunctions.getOldRoomsByRoomId(item.id);
+    const currentRoom: OldRoomData = {
+      id: item.id,
+      allBudget: item.allBudget,
+      amount: item.amount,
+      linstingDateCode: item.linstingDateCode
+    }
+    const mergedArray: OldRoomData[] = [...oldRooms, currentRoom];
+    mergedArray.sort((a, b) => parseInt(b.linstingDateCode) - parseInt(a.linstingDateCode));
+    return mergedArray;
+  } catch (error) {
+    console.error('Error fetching old rooms:', error);
+    return []; 
+  }
+};
+
 // // Example usage
 // (async () => {
 //   try {
@@ -451,5 +490,7 @@ export const firestoreFunctions = {
   deleteDocumentByIdAttribute,
   updateDocumentBudgetByIdAttribute,
   updateUserArrayInRoom,
+  getOldRoomsByRoomId,
+  loadAllRooms
 };
 

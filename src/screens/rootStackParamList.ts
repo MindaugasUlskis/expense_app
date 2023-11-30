@@ -13,6 +13,5 @@ export type RootStackParamList = {
 
   type OverviewScreenParams ={
     item: RoomData, 
-    listings: ListingData[]
     currentExpenses: number
   }

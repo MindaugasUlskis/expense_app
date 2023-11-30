@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         marginBottom: -15,
-        backgroundColor: 'transparent', // Set background color to transparent
+        backgroundColor: 'transparent',
     },
     headerText1: {
         fontSize: 28,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     },
     headerText2: {
         fontSize: 34,
-        fontWeight: 'bold', // Make the second line bold, adjust as needed
+        fontWeight: 'bold',
         color: Colors.helper1,
         fontFamily: Colors.text1,
         elevation: 10

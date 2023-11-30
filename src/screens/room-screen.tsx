@@ -87,7 +87,7 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
     
   };
   const  handleOverview = async () => {
-    navigation.navigate('Overview', {item, listings, currentExpenses })
+    navigation.navigate('Overview', {item, currentExpenses })
   };
 
 

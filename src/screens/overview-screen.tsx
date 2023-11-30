@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { RootStackParamList } from './rootStackParamList';
 import { RouteProp } from '@react-navigation/native';
@@ -6,34 +6,87 @@ import Colors from '../utils/palette';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PieChart } from 'react-native-chart-kit';
 import { calculateTotalAmountByCategory, calculateTotalAmountByUser, calculateBudgetWastedPercentage, calculatePercentageSpent } from '../utils/functions/calculateChardData';
+import OverviewHeader from '../ui/components/overview-header';
+import { ListingData, OldRoomData, RoomData, firestoreFunctions } from '../api/database-requests';
+import { useState, useEffect } from 'react';
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type OverviewScreenRouteProp = RouteProp<RootStackParamList, 'Overview'>;
 
 const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,  navigation: ScreenNavigationProp  }) => {
     const [item, setItem] = useState(route.params?.item);
-    const [listings, setListings] = useState(route.params?.listings);
+    const [listings, setListings] = useState<ListingData[]>([]);
     const [currentExpenses, setCurrentExpenses] = useState(route.params?.currentExpenses);
+    const [dateCode, setDateCode] = useState(item.linstingDateCode);
+    const [allBudget, setAllBudget] = useState(item.allBudget)
+    const [roomIndex, setRoomIndex] = useState(0)
+    const [displayedRoom, setDisplayedRoom] = useState<OldRoomData>(item)
+    
+    const hardcodedColors = ['#FF5733', '#33FF57', '#5733FF', '#FF5733', '#33FF57', '#5733FF'];
+
+
+    const fetchListings = async () => {
+      try {
+        const roomID = item.id;
+        const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
+        const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
+        setListings(fetchedListings);
+        setCurrentExpenses(totalAmount)
+
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      }
+    };
+
+    useEffect(() => {
+      const fetchData = async () => {
+          try {
+              const roomArray = await firestoreFunctions.loadAllRooms(item);
+              console.log('old roooms', roomArray);
+
+              const roomID = item.id;
+              const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, roomArray[roomIndex].linstingDateCode);
+              const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
+              setDisplayedRoom(roomArray[roomIndex])
+              setListings(fetchedListings);
+              setCurrentExpenses(totalAmount);
+
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
+      fetchData();
+  }, [item.id, dateCode, roomIndex]);
+
+
+    const totalAmountByCategory = calculateTotalAmountByCategory(listings);
+    const totalAmountByUser = calculateTotalAmountByUser(listings);
+    const budgetWasted = calculateBudgetWastedPercentage(totalAmountByCategory, allBudget)
+    const percentageSpent = calculatePercentageSpent(currentExpenses, allBudget)
     
 
-      console.log(calculateTotalAmountByCategory(listings))
-      console.log(calculateTotalAmountByUser(listings))
-      console.log(calculateBudgetWastedPercentage(calculateTotalAmountByCategory(listings), item.allBudget))
-      console.log(calculatePercentageSpent(currentExpenses, item.allBudget))
 
-      const totalAmountByCategory = calculateTotalAmountByCategory(listings);
-      const totalAmountByUser = calculateTotalAmountByUser(listings);
+
+  const  handleLeft = async () => {
+    setRoomIndex ( roomIndex + 1 )
+
     
+  };
+  const  handleRight = async () => {
+    setRoomIndex ( roomIndex - 1 )
+  };
+
+
 
      
       return (
         <View>
-          {/* Pie Chart for Total Amount by Category */}
+          <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} />
           <Text>Total Amount by Category</Text>
           <PieChart
-            data={totalAmountByCategory.map((dataPoint) => ({
+            data={totalAmountByCategory.map((dataPoint, index) => ({
               name: dataPoint.category,
               value: dataPoint.totalAmount,
-              color: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
+              color: hardcodedColors[index % hardcodedColors.length],
             }))}
             width={300}
             height={200}
@@ -43,18 +96,17 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
               color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             }}
-            accessor="value" // Add accessor property
-            backgroundColor="transparent" // Add backgroundColor property
-            paddingLeft="15" // Add paddingLeft property
+            accessor="value" 
+            backgroundColor="transparent" 
+            paddingLeft="15"
           />
-    
-          {/* Pie Chart for Total Amount by User */}
+
           <Text>Total Amount by User</Text>
           <PieChart
-            data={totalAmountByUser.map((dataPoint) => ({
+            data={totalAmountByUser.map((dataPoint, index) => ({
               name: dataPoint.user,
               value: dataPoint.totalAmount,
-              color: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
+              color: hardcodedColors[index % hardcodedColors.length],
             }))}
             width={300}
             height={200}
@@ -63,9 +115,9 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
               backgroundGradientTo: '#08130D',
               color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
             }}
-            accessor="value" // Add accessor property
-            backgroundColor="transparent" // Add backgroundColor property
-            paddingLeft="15" // Add paddingLeft property
+            accessor="value" 
+            backgroundColor="transparent" 
+            paddingLeft="15" 
           />
         </View>
       );
@@ -81,5 +133,4 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.primary,
     },
   });
-  
-  
+
