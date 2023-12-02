@@ -1,15 +1,35 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../utils/palette';
 import { getMonthName } from '../../utils/functions/monthNumberToWord';
 interface HeaderProps {
     dateCode: string,
-    index?: 'newest' | 'oldest' | 'single'
+    index?: 'newest' | 'oldest' | 'single' | ''
     left: () => void;
     right: () => void;
 }
 const OverviewHeader: React.FC<HeaderProps> = ({ dateCode, index, left, right }) => {
+    const [disabledLeft, setDisabledLeft] = useState(false)
+    const [disabledRight, setDisabledRight] = useState(false)
+
+    useEffect(() => {
+        // Update disabledLeft and disabledRight based on the index prop
+        if (index === 'single') {
+            setDisabledLeft(true);
+            setDisabledRight(true);
+        } else if (index === 'oldest') {
+            setDisabledLeft(true);
+            setDisabledRight(false);
+        } else if (index === 'newest') {
+            setDisabledLeft(false);
+            setDisabledRight(true);
+        } else {
+            setDisabledLeft(false);
+            setDisabledRight(false);
+        }
+    }, [index]);
+
 
     const month = getMonthName(dateCode.slice(-2), true)
     const year = dateCode.slice(0, 4)
@@ -22,14 +42,14 @@ const OverviewHeader: React.FC<HeaderProps> = ({ dateCode, index, left, right })
 
     return (
         <View style={styles.header}>
-            <TouchableOpacity style={styles.squareButton} onPress={left}>
+            <TouchableOpacity style={styles.squareButton} onPress={left} disabled={disabledLeft}>
                 <Icon name="angle-left" size={38} color={leftIconColor} />
             </TouchableOpacity>
             <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                 <Text style={styles.headerText2}>{month}</Text>
                 <Text style={styles.headerText1}>{year}</Text>
             </View>
-            <TouchableOpacity style={styles.squareButton} onPress={right}>
+            <TouchableOpacity style={styles.squareButton} onPress={right} disabled={disabledRight}>
                 <Icon name="angle-right" size={38} color={rightIconColor} />
             </TouchableOpacity>
         </View>

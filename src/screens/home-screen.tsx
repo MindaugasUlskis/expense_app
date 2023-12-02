@@ -12,18 +12,19 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Room'>;
-const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
+const HomeScreen  = ({ navigation }: { navigation: ScreenNavigationProp }) => {
 
   const [isCreateRoomModalVisible, setCreateRoomModalVisible] = useState(false);;
   const [isJoinRoomModalVisible, setJoinRoomModalVisible] = useState(false);
   const [rooms, setRooms] = useState<RoomData[]>([]);
 
-
+ 
   useEffect(() => {
-    // Fetch rooms when the component mounts
     fetchRooms();
+
   }, []);
   useFocusEffect(
+
     useCallback(() => {
       fetchRooms();
     }, [])
@@ -34,7 +35,6 @@ const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
     firestoreFunctions.getRoomsByUserId(firestoreFunctions.getCurrentUserId())
       .then((rooms) => {
         setRooms(rooms);
-        console.log('Rooms for user', firestoreFunctions.getCurrentUserId(), ':', rooms);
       })
       .catch((error) => {
         console.error('Error:', error);

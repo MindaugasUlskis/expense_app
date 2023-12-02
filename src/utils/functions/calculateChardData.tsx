@@ -19,22 +19,22 @@ export const calculateTotalAmountByCategory = (listings: ListingData[]): { categ
 
     return result;
 };
-export const calculateTotalAmountByUser = (listings: ListingData[]): { user: string; totalAmount: number }[] => {
+export const calculateTotalAmountByUser = (listings: ListingData[]): { userNickName: string; totalAmount: number }[] => {
     const userMap: { [key: string]: number } = {};
 
     listings.forEach((listing) => {
-        const { user, amount } = listing;
+        const { userNickName, amount } = listing;
 
-        if (userMap[user]) {
-            userMap[user] += amount;
+        if (userMap[userNickName]) {
+            userMap[userNickName] += amount;
         } else {
-            userMap[user] = amount;
+            userMap[userNickName] = amount;
         }
     });
 
-    const result = Object.keys(userMap).map((user) => ({
-        user,
-        totalAmount: userMap[user],
+    const result = Object.keys(userMap).map((userNickName) => ({
+        userNickName,
+        totalAmount: userMap[userNickName],
     }));
 
     return result;

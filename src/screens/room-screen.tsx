@@ -33,10 +33,7 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
         const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
         setListings(fetchedListings);
         setCurrentExpenses(totalAmount)
-        console.log(`Total amount: ${totalAmount}`);
 
-        console.log('fetched listings')
-        console.log(`listing count ${fetchedListings.length}`)
       } catch (error) {
         console.error('Error fetching listings:', error);
       }
@@ -137,7 +134,7 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
             isVisible={isCreateRoomModalVisible}
             onClose={toggleCreateAListing}
             onCreateListing={handleCreateListing}
-            categories={['Car', 'Bills', 'Groceries']}
+            categories={['Bills', 'Car', 'Dining', 'Entertainment', 'Groceries', 'Health', 'Miscellaneous', 'Subscriptions', 'Travel', 'Utilities']}
             item={item}
           />
            <RoomSettingsModal
@@ -146,6 +143,7 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
             onLeave={handleUserLeave}
             onbudgetChange={handleBudgetChange}
             currentBudget={item.allBudget}
+            item={item}
           />
         </View>
       );

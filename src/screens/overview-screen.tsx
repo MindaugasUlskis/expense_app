@@ -20,36 +20,46 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
     const [allBudget, setAllBudget] = useState(item.allBudget)
     const [roomIndex, setRoomIndex] = useState(0)
     const [displayedRoom, setDisplayedRoom] = useState<OldRoomData>(item)
+    const [index, setIndex] = useState<'newest' | 'oldest' | 'single' | ''>('')
     
-    const hardcodedColors = ['#FF5733', '#33FF57', '#5733FF', '#FF5733', '#33FF57', '#5733FF'];
+    const hardcodedColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#ff5733', '#33FF57', '#5733FF', '#00FF00', '#FF00FF'];
 
 
-    const fetchListings = async () => {
-      try {
-        const roomID = item.id;
-        const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
-        const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
-        setListings(fetchedListings);
-        setCurrentExpenses(totalAmount)
 
-      } catch (error) {
-        console.error('Error fetching listings:', error);
-      }
-    };
+    // const fetchListings = async () => {
+    //   try {
+    //     const roomID = item.id;
+    //     const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
+    //     const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
+    //     setListings(fetchedListings);
+    //     setCurrentExpenses(totalAmount)
+
+    //   } catch (error) {
+    //     console.error('Error fetching listings:', error);
+    //   }
+    // };
 
     useEffect(() => {
       const fetchData = async () => {
           try {
               const roomArray = await firestoreFunctions.loadAllRooms(item);
-              console.log('old roooms', roomArray);
-
               const roomID = item.id;
               const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, roomArray[roomIndex].linstingDateCode);
               const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
               setDisplayedRoom(roomArray[roomIndex])
               setListings(fetchedListings);
               setCurrentExpenses(totalAmount);
-
+              if (roomArray.length === 1) {
+                setIndex('single');
+            } else {
+                if (roomIndex === 0) {
+                    setIndex('newest');
+                } else if (roomIndex === roomArray.length - 1) {
+                    setIndex('oldest');
+                } else {
+                    setIndex('');
+                }
+            }
           } catch (error) {
               console.error('Error fetching data:', error);
           }
@@ -80,7 +90,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
      
       return (
         <View>
-          <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} />
+          <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} index={index} />
           <Text>Total Amount by Category</Text>
           <PieChart
             data={totalAmountByCategory.map((dataPoint, index) => ({
@@ -104,7 +114,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
           <Text>Total Amount by User</Text>
           <PieChart
             data={totalAmountByUser.map((dataPoint, index) => ({
-              name: dataPoint.user,
+              name: dataPoint.userNickName,
               value: dataPoint.totalAmount,
               color: hardcodedColors[index % hardcodedColors.length],
             }))}

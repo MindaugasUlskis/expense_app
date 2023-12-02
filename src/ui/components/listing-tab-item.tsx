@@ -14,6 +14,7 @@ function ListingItem({ data, onDelete }: ListingItemProps) {
     const date = new Date(data.date);
     
 
+
     
     // Format the date to display only the day and time
     const months = [
@@ -40,7 +41,8 @@ function ListingItem({ data, onDelete }: ListingItemProps) {
                 </View>
                 <View style={styles.rightColumn}>
                         <Icon onPress={onDelete} name="trash" size={24} color="red" style={styles.trashIcon} />
-                    <Text style={styles.dateText}>{formattedDate.toLowerCase()}</Text>
+                    <Text style={styles.dateText}>   {data.userNickName.charAt(0).toUpperCase() + data.userNickName.slice(1).toLowerCase()}</Text>
+                    <Text style={styles.dateText}> {formattedDate.toLowerCase()}</Text>
                 </View>
             </View>
     );

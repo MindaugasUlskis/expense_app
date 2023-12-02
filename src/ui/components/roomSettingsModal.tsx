@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Modal, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from '../../utils/palette';
+import { RoomData } from '../../api/database-requests';
 
 interface RoomSettingsModalProps {
     isVisible: boolean;
@@ -8,12 +9,11 @@ interface RoomSettingsModalProps {
     onClose: () => void;
     onLeave: () => void;
     onbudgetChange: (budget: number) => void;
+    item: RoomData
 }
 
-const RoomSettingsModal: React.FC<RoomSettingsModalProps> = ({ isVisible, onClose, onLeave, onbudgetChange, currentBudget }) => {
+const RoomSettingsModal: React.FC<RoomSettingsModalProps> = ({ isVisible, onClose, onLeave, onbudgetChange, currentBudget, item }) => {
     const [budget, setBudget] = useState(currentBudget.toString());
-
-
 
     return (
         <Modal transparent animationType="slide" visible={isVisible}>
@@ -37,6 +37,12 @@ const RoomSettingsModal: React.FC<RoomSettingsModalProps> = ({ isVisible, onClos
                             <Text style={styles.buttonText}>save</Text>
                         </TouchableOpacity>
                     </View>
+                    <Text style={[styles.modalText, { color: Colors.helper1, textAlign: 'justify', marginBottom: 10 }]}>
+                        Invite code for this room is
+                    </Text>
+                    <Text style={[styles.inviteText]}>
+                           {item.inviteId}
+                    </Text>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
@@ -76,6 +82,16 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 10,
         fontWeight: 'bold',
+    },
+    inviteText: {
+        fontSize: 18,
+        paddingHorizontal: 25,
+        fontWeight: 'bold',
+        color: Colors.secondary,
+        textAlign: 'justify',
+        backgroundColor:'white',
+        padding: 10,
+        borderRadius: 10
     },
     input: {
         width: '90%',

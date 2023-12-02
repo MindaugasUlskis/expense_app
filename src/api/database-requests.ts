@@ -24,10 +24,9 @@ export type OldRoomData = {
   amount: number
   linstingDateCode: string
 };
-export type UserData = {
-  name: string;
-  password: string;
-  nock: string;
+export type User = {
+  username: string;
+  userID: string;
 };
 export type CategoryData = {
   name: string;
@@ -45,6 +44,25 @@ export type ListingData = {
   amount: number;
   date: string;
   dateCode: string;
+  userNickName: string;
+};
+const checkDocumentAndUsername = async (userID: string): Promise<boolean> => {
+  try {
+    const collectionRef = firestore().collection('User');
+
+    const querySnapshot = await collectionRef
+      .where('userID', '==', userID)
+      .where('username', '!=', '')
+      .get();
+
+    if (querySnapshot.docs.length === 0) {
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+
+  return true;
 };
 
 const deleteDocumentByIdAttribute = async (docId: string, collection: string) => {
@@ -59,7 +77,6 @@ const deleteDocumentByIdAttribute = async (docId: string, collection: string) =>
     const docRef = querySnapshot.docs[0].ref;
     await docRef.delete();
 
-    console.log(`Document with ID ${docId} deleted successfully`);
   } catch (error) {
     console.error('Error deleting document:', error);
   }
@@ -102,11 +119,66 @@ const updateUserArrayInRoom = async (roomId: string, userIdToRemove: string) => 
       userIds: updatedUsers,
     });
 
-    console.log(`User with ID ${userIdToRemove} removed from room with ID ${roomId}`);
+
   } catch (error) {
     console.error('Error updating users array in room:', error);
   }
 };
+const updateNickname = async (nick: string, userId: string) => {
+  try {
+    const collectionRef = firestore().collection("Nicknames");
+    const querySnapshot = await collectionRef.where('userID', '==', userId).get();
+
+    if (querySnapshot.docs.length === 0) {
+      console.warn(`User with ID ${userId} not found`);
+      return;
+    }
+    const userDoc = querySnapshot.docs[0];
+
+    await userDoc.ref.update({
+      nickname: nick,
+    });
+
+  } catch (error) {
+    console.error('Error updating user nickname', error);
+  }
+};
+
+async function addNick(user: User) {
+  const roomRef = firestore().collection('Nicknames').doc();
+  await roomRef.set(user);
+  return roomRef.id;
+}
+
+async function createNickname(nick: string, userId: string) {
+  try {
+    const userData: User = {
+      username: nick,
+      userID: userId
+    };
+    const user = await firestoreFunctions.addNick(userData);
+    return user;
+  } catch (error) {
+    console.error('Error creating nickname:', error);
+    throw error;
+  }
+};
+
+const getNicknameByUserIDSync = async (userId: string): Promise<string> => {
+  try {
+    const collectionRef = firestore().collection("Nicknames");
+    const querySnapshot = await collectionRef.where('userID', '==', userId).get();
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc ? userDoc.data().username : '';
+
+    return userData;
+  } catch (error) {
+    console.error('Error getting user nickname', error);
+    return '';
+  }
+};
+
 
 // Function to read all users from Firestore
 async function getUsers() {
@@ -198,7 +270,6 @@ async function getListingsByRoomIdAndDateCode(roomid: string, datecode: string):
       .where('roomid', '==', roomid)
       .where('dateCode', '==',datecode)
       .get();
-      console.log(listingsSnapshot.docs)
     const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ListingData[];
     listings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return listings;
@@ -239,7 +310,6 @@ async function joinRoom(inviteId: string, userId: string) {
       userIds: updatedUserIds,
     });
 
-    console.log('User successfully added to the room');
   } catch (error) {
     showError(`${error}`)
   }
@@ -247,13 +317,6 @@ async function joinRoom(inviteId: string, userId: string) {
 
 
 
-
-
-async function addUser(userData: UserData) {
-  const userRef = firestore().collection('Users').doc();
-  await userRef.set(userData);
-  return userRef.id;
-}
 
 // Function to add a new room to Firestore
 async function addRoom(roomData: RoomData) {
@@ -321,7 +384,6 @@ function getCurrentUserId() {
   if (user) {
     return user.uid;
   }
-  console.log('no user signed in')
   return "null, error";
 };
 
@@ -348,7 +410,7 @@ async function updateRoomData(item: RoomData) {
     if (roomQuerySnapshot.docs.length > 0) {
       const roomDoc = roomQuerySnapshot.docs[0];
       await roomDoc.ref.update(updatedRoomData);
-      console.log('Room data updated successfully');
+
     } else {
       console.log('No room found for the given ID');
     }
@@ -391,7 +453,9 @@ async function getRoomByRoomId(roomId: string): Promise<RoomData>{
 
 async function createListing(amount: number, userId: string, category: string, roomId: string): Promise<string> {
   try {
-    
+
+  const nick = await getNicknameByUserIDSync(userId)
+
     const listingData: ListingData = {
       roomid: roomId,
       id: uuidv4(),
@@ -400,11 +464,12 @@ async function createListing(amount: number, userId: string, category: string, r
       amount: amount,
       date: new Date().toISOString(),
       dateCode: generateDateCode(),
+      userNickName: nick
     };
     const listingId = await firestoreFunctions.addListing(listingData);
     return listingId;
   } catch (error) {
-    showError(`Error updating room data: ${error}`);
+    showError(`Error creating a listing: ${error}`);
     return 'error in creation of listing'
   }
 }
@@ -471,7 +536,6 @@ export const firestoreFunctions = {
   getRooms,
   getCategories,
   getListings,
-  addUser,
   addRoom,
   addCategory,
   addListing,
@@ -491,6 +555,12 @@ export const firestoreFunctions = {
   updateDocumentBudgetByIdAttribute,
   updateUserArrayInRoom,
   getOldRoomsByRoomId,
-  loadAllRooms
+  loadAllRooms,
+  checkDocumentAndUsername,
+  createNickname,
+  addNick,
+  updateNickname,
+  getNicknameByUserIDSync
+
 };
 

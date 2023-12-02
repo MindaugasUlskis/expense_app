@@ -1,16 +1,21 @@
 import auth from '@react-native-firebase/auth';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../screens/rootStackParamList';
+import { firestoreFunctions } from '../../api/database-requests';
+import { extractNicknameFromEmail } from './nickname-extractor';
 
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 // Function to handle user login
 export const loginOrRegister = async (email: string, password: string, navigation: ScreenNavigationProp) => {
+  const nickname = extractNicknameFromEmail(email);
+
   auth()
     .createUserWithEmailAndPassword(email,  password)
-    .then(() => {
+    .then(async () => {
       console.log('User account created & signed in!');
+      await firestoreFunctions.createNickname(nickname, firestoreFunctions.getCurrentUserId())
       navigation.navigate('Home')
     })
     .catch((error: { code: string; }) => {
@@ -19,6 +24,7 @@ export const loginOrRegister = async (email: string, password: string, navigatio
           .signInWithEmailAndPassword(email,  password)
           .then(() => {
             console.log('User signed in!');
+
             navigation.navigate('Home')
           })
           .catch(error => {

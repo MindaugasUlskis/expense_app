@@ -16,7 +16,7 @@ const LoginScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
   };
 
   const fillMockData = () => {
-    setEmail('mock@gmail.com');
+    setEmail('mindaugas@gmail.com');
     setPassword('mock1234');
   };
 
