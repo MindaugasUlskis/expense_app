@@ -20,22 +20,22 @@ function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerShown: false }} // Hide header for HomeScreen
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }} // Hide header for LoginScreen
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Room"
           component={RoomScreen}
-          options={{ headerShown: false }} // Hide header for LoginScreen
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="Overview"
           component={OverviewScreen}
-          options={{ headerShown: false }} // Hide header for LoginScreen
+          options={{ headerShown: false }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

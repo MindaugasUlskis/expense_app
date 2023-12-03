@@ -92,7 +92,7 @@ const updateDocumentBudgetByIdAttribute = async (docId: string, newBudget: numbe
     }
     const docRef = querySnapshot.docs[0].ref;
     await docRef.update({
-      budget: newBudget,
+      allBudget: newBudget,
     });
 
     console.log(`Budget for document with ID ${docId} updated successfully`);
@@ -179,8 +179,6 @@ const getNicknameByUserIDSync = async (userId: string): Promise<string> => {
   }
 };
 
-
-// Function to read all users from Firestore
 async function getUsers() {
   try {
     const usersSnapshot = await firestore()
@@ -194,7 +192,6 @@ async function getUsers() {
   }
 }
 
-// Function to read all rooms from Firestore
 async function getRooms() {
   try {
     const roomsSnapshot = await firestore()
@@ -208,7 +205,7 @@ async function getRooms() {
   }
 }
 
-// Function to read all categories from Firestore
+
 async function getCategories() {
   try {
     const categoriesSnapshot = await firestore()
@@ -222,7 +219,7 @@ async function getCategories() {
   }
 }
 
-// Function to read all listings from Firestore
+
 async function getListings() {
   try {
     const listingsSnapshot = await firestore()
@@ -281,29 +278,26 @@ async function getListingsByRoomIdAndDateCode(roomid: string, datecode: string):
 
 async function joinRoom(inviteId: string, userId: string) {
   try {
-    // Find the room by inviteId
+
     const roomQuerySnapshot = await firestore()
       .collection('Rooms')
       .where('inviteId', '==', inviteId)
       .get();
 
-    // Check if the room exists
+
     if (roomQuerySnapshot.size === 0) {
       showError('Room not found with the provided inviteId')
       throw new Error('Room not found with the provided inviteId');
     }
 
-    // Extract room data
     const roomDoc = roomQuerySnapshot.docs[0];
     const roomData = roomDoc.data() as RoomData;
 
-    // Check if the userId is already in the userids array
     if (roomData.userIds.includes(userId)) {
       showError('User is already a member of the room')
       throw new Error('User is already a member of the room');
     }
 
-    // Update the room document by adding the userId to the userids array
     const updatedUserIds = [...roomData.userIds, userId];
 
     await roomDoc.ref.update({
@@ -318,7 +312,7 @@ async function joinRoom(inviteId: string, userId: string) {
 
 
 
-// Function to add a new room to Firestore
+
 async function addRoom(roomData: RoomData) {
   const roomRef = firestore().collection('Rooms').doc();
   await roomRef.set(roomData);
@@ -329,14 +323,14 @@ async function addOldRoom(roomData: OldRoomData) {
   await roomRef.set(roomData);
   return roomRef.id;
 }
-// Function to add a new category to Firestore
+
 async function addCategory(categoryData: CategoryData) {
   const categoryRef = firestore().collection('Categories').doc();
   await categoryRef.set(categoryData);
   return categoryRef.id;
 }
 
-// Function to add a new listing to Firestore                             
+                            
 async function addListing(listingData: ListingData) {
   const listingRef = firestore().collection('Listings').doc();
   await listingRef.set(listingData);
@@ -511,25 +505,6 @@ const loadAllRooms = async (item : RoomData) => {
     return []; 
   }
 };
-
-// // Example usage
-// (async () => {
-//   try {
-//     const users = await getUsers();
-//     console.log('Users:', users);
-
-//     const rooms = await getRooms();
-//     console.log('Rooms:', rooms);
-
-//     const categories = await getCategories();
-//     console.log('Categories:', categories);
-
-//     const listings = await getListings();
-//     console.log('Listings:', listings);
-//   } catch (error) {
-//     console.error('Error:', error);
-//   }
-// })();
 
 export const firestoreFunctions = {
   getUsers,

@@ -13,7 +13,10 @@ const ExpenseRoomHeader: React.FC<RoomHeaderProps> = ({ text, renderButtons }) =
                 <Text style={styles.headerText1}>My Room</Text>
                 <Text style={styles.headerText2}>{text}</Text>
             </View>
+            <View style={{paddingLeft:35}}>
             {renderButtons && renderButtons()}
+            </View>
+
         </View>
     );
 };

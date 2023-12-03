@@ -105,7 +105,7 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
     }, [item]);
     const renderButtons = () => (
         <View style={styles.createRoomContainer}>
-          <TouchableOpacity style={styles.squareButton} onPress={toggleRoomSettings}>
+          <TouchableOpacity style={styles.roundButtonSecondary} onPress={toggleRoomSettings}>
             <Icon name="cog" size={30} color={Colors.helper1} />
           </TouchableOpacity>
         </View>
@@ -123,8 +123,8 @@ const RoomScreen = ({ route, navigation }: { route: RoomScreenRouteProp,  naviga
             </View>
           </ScrollView>
           <View style={styles.centeredButtonContainer} >
-          <TouchableOpacity style={styles.squareButton} onPress={handleOverview}>
-            <Icon name="minus" size={30} color={Colors.helper1} />
+          <TouchableOpacity style={[styles.roundButtonSecondary,{marginRight: 50}]} onPress={handleOverview}>
+            <Icon name="bar-chart" size={30} color={Colors.helper1} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.squareButton} onPress={toggleCreateAListing}>
             <Icon name="plus" size={30} color={Colors.helper1} />
@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
     },
     createRoomContainer: {
       flex: 0.5,
-      flexDirection: 'column', // 10% of available space
+      flexDirection: 'column',
       justifyContent: 'space-evenly',
       alignItems: 'center',
     },
     squareButton: {
       backgroundColor: Colors.secondary,
-      borderRadius: 50, // Make it a square with rounded corners
+      borderRadius: 50,
       justifyContent: 'center',
       alignItems: 'center',
       padding: 16,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
       elevation: 10,
     },
     buttonText: {
-      fontSize: Colors.fontsize2, // Assuming Colors.fontsize1 is defined
+      fontSize: Colors.fontsize2,
       color: Colors.helper1,
       fontFamily: Colors.font1,
       elevation: 10,
@@ -194,13 +194,25 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
     },
-    centeredButtonContainer:{
+    centeredButtonContainer: {
       height: '5%',
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 2,
       bottom: 25,
-    }
+      flexDirection: 'row'
+    },
+    roundButtonSecondary: {
+      backgroundColor: Colors.primary,
+      borderRadius: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+      width: 60,
+      height: 60,
+      elevation: 10,
+      
+    },
   });
   
   

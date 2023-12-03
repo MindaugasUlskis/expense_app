@@ -14,7 +14,6 @@ const OverviewHeader: React.FC<HeaderProps> = ({ dateCode, index, left, right })
     const [disabledRight, setDisabledRight] = useState(false)
 
     useEffect(() => {
-        // Update disabledLeft and disabledRight based on the index prop
         if (index === 'single') {
             setDisabledLeft(true);
             setDisabledRight(true);

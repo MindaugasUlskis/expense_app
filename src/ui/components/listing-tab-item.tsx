@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Replace with your actual icon library
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import Colors from '../../utils/palette';
 import { ListingData, firestoreFunctions } from '../../api/database-requests';
 import { Button } from '@ant-design/react-native';
@@ -12,11 +12,7 @@ interface ListingItemProps {
 
 function ListingItem({ data, onDelete }: ListingItemProps) {
     const date = new Date(data.date);
-    
 
-
-    
-    // Format the date to display only the day and time
     const months = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -63,15 +59,15 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     leftColumn: {
-        flex: 2, // Adjust the flex values as needed
+        flex: 2, 
     },
     rightColumn: {
-        flex: 1, // Adjust the flex values as needed
+        flex: 1,
         alignItems: 'flex-end',
-        flexDirection: "column" // Align user name and trash button to the right
+        flexDirection: "column" 
     },
     amountText: {
-        fontSize: 28, // Large and bold font
+        fontSize: 28, 
         fontWeight: 'bold',
         color: Colors.helper1,
         marginLeft: 25,

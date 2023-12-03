@@ -25,7 +25,10 @@ interface JoinRoomModalProps {
         <View style={[styles.overlay,]}>
           <View style={styles.modalContainer}>
             <Text style={[styles.modalText, { color: Colors.helper1, textAlign: 'justify', marginBottom: 0 }]}>
-              Enter the Room ID
+              Enter the Invite ID of a Room
+            </Text>
+            <Text style={[styles.modalText, { color: Colors.helper1, textAlign: 'justify', marginBottom: 0 }]}>
+               You Want To Join
             </Text>
             <TextInput
               style={styles.input}
@@ -70,6 +73,7 @@ interface JoinRoomModalProps {
       fontSize: 18,
       marginBottom: 10,
       fontWeight: 'bold',
+      textAlign: 'justify'
     },
     input: {
       width: '90%',

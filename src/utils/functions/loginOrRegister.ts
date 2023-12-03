@@ -7,38 +7,33 @@ import { extractNicknameFromEmail } from './nickname-extractor';
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-// Function to handle user login
-export const loginOrRegister = async (email: string, password: string, navigation: ScreenNavigationProp) => {
+export const loginOrRegister = async (email: string, password: string, navigation: ScreenNavigationProp): Promise<boolean> => {
   const nickname = extractNicknameFromEmail(email);
 
-  auth()
-    .createUserWithEmailAndPassword(email,  password)
-    .then(async () => {
-      console.log('User account created & signed in!');
-      await firestoreFunctions.createNickname(nickname, firestoreFunctions.getCurrentUserId())
-      navigation.navigate('Home')
-    })
-    .catch((error: { code: string; }) => {
-      if (error.code === 'auth/email-already-in-use') {
-        auth()
-          .signInWithEmailAndPassword(email,  password)
-          .then(() => {
-            console.log('User signed in!');
-
-            navigation.navigate('Home')
-          })
-          .catch(error => {
-            if (error.code === 'auth/wrong-password') {
-              // Handle the case where the password is wrong
-              console.log('Wrong password. Please check your password.');
-            } else {
-              // Handle other sign-in errors
-              console.error('Error signing in user:', error);
-          }});
+  try {
+    await auth().createUserWithEmailAndPassword(email, password);
+    console.log('User account created & signed in!');
+    await firestoreFunctions.createNickname(nickname, firestoreFunctions.getCurrentUserId());
+    navigation.navigate('Home');
+    return true; 
+  } catch (createUserError: any) {
+    if (createUserError.code === 'auth/email-already-in-use') {
+      try {
+        await auth().signInWithEmailAndPassword(email, password);
+        console.log('User signed in!');
+        navigation.navigate('Home');
+        return true; 
+      } catch (signInError: any) {
+        if (signInError.code === 'auth/wrong-password') {
+          throw new Error('Wrong password. Please check your password.');
+        } else {
+          throw new Error('Error signing in user. Please try again.');
+        }
       }
-      if (error.code === 'auth/invalid-email') {
-        console.log('That email address is invalid!');
-      }
-      console.error(error);
-    });
+    } else if (createUserError.code === 'auth/invalid-email') {
+      throw new Error('That email address is invalid!');
+    } else {
+      throw new Error('Error creating user account. Please try again.');
+    }
+  }
 };

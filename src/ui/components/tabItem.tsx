@@ -25,7 +25,7 @@ function TabItem({ label, userCount,onClick}: TabItemProps) {
 
 const styles = StyleSheet.create({
   tabContainer: {
-    height: 100, // Set a fixed height
+    height: 100, 
     width: '90%',
     borderRadius: 10,
     marginVertical: 10,

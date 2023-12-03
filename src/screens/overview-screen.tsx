@@ -23,22 +23,6 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
     const [index, setIndex] = useState<'newest' | 'oldest' | 'single' | ''>('')
     
     const hardcodedColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#ff5733', '#33FF57', '#5733FF', '#00FF00', '#FF00FF'];
-
-
-
-    // const fetchListings = async () => {
-    //   try {
-    //     const roomID = item.id;
-    //     const fetchedListings = await firestoreFunctions.getListingsByRoomIdAndDateCode(roomID, dateCode);
-    //     const totalAmount = fetchedListings.reduce((acc, listing) => acc + listing.amount, 0);
-    //     setListings(fetchedListings);
-    //     setCurrentExpenses(totalAmount)
-
-    //   } catch (error) {
-    //     console.error('Error fetching listings:', error);
-    //   }
-    // };
-
     useEffect(() => {
       const fetchData = async () => {
           try {
@@ -49,6 +33,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
               setDisplayedRoom(roomArray[roomIndex])
               setListings(fetchedListings);
               setCurrentExpenses(totalAmount);
+              setAllBudget(roomArray[roomIndex].allBudget)
               if (roomArray.length === 1) {
                 setIndex('single');
             } else {
@@ -70,7 +55,6 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
 
     const totalAmountByCategory = calculateTotalAmountByCategory(listings);
     const totalAmountByUser = calculateTotalAmountByUser(listings);
-    const budgetWasted = calculateBudgetWastedPercentage(totalAmountByCategory, allBudget)
     const percentageSpent = calculatePercentageSpent(currentExpenses, allBudget)
     
 
@@ -87,60 +71,106 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
 
 
 
-     
-      return (
-        <View>
-          <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} index={index} />
-          <Text>Total Amount by Category</Text>
-          <PieChart
-            data={totalAmountByCategory.map((dataPoint, index) => ({
-              name: dataPoint.category,
-              value: dataPoint.totalAmount,
-              color: hardcodedColors[index % hardcodedColors.length],
-            }))}
-            width={300}
-            height={200}
-            chartConfig={{
-              backgroundGradientFrom: '#1E2923',
-              backgroundGradientTo: '#08130D',
-              color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            }}
-            accessor="value" 
-            backgroundColor="transparent" 
-            paddingLeft="15"
-          />
+  return (
+    <View style={styles.container}>
+      <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} index={index} />
+      <View style={{backgroundColor:Colors.helper1, width: '100%',}}> 
+      <Text style={styles.budgetInfo}>
+        Total Amount Spent: ${currentExpenses.toFixed(2)}
+      </Text>
+      <Text style={styles.budgetInfo}>
+        Budget: ${allBudget.toFixed(2)}
+      </Text>
+      <Text style={styles.budgetInfo}>
+        Budget Spent: {percentageSpent.toFixed(2)}%
+      </Text>
+      </View>
 
-          <Text>Total Amount by User</Text>
-          <PieChart
-            data={totalAmountByUser.map((dataPoint, index) => ({
-              name: dataPoint.userNickName,
-              value: dataPoint.totalAmount,
-              color: hardcodedColors[index % hardcodedColors.length],
-            }))}
-            width={300}
-            height={200}
-            chartConfig={{
-              backgroundGradientFrom: '#1E2923',
-              backgroundGradientTo: '#08130D',
-              color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-            }}
-            accessor="value" 
-            backgroundColor="transparent" 
-            paddingLeft="15" 
-          />
-        </View>
-      );
-};
+      <View style={styles.pieChartContainer}>
+        <Text style={styles.sectionTitle}>Total Amount by Category</Text>
+        <PieChart
+        data={totalAmountByCategory.map((dataPoint, index) => {
+          const formattedAmount = dataPoint.totalAmount.toFixed(2);
+          const formattedLabel = `${formattedAmount.padEnd(4, ' ')} Eur.\n${dataPoint.category}`;
+          return {
+            name: formattedLabel,
+            value: dataPoint.totalAmount,
+            color: hardcodedColors[index % hardcodedColors.length],
+          };
+        })}
+          width={450}
+          height={200}
+          
+          chartConfig={{
+            backgroundGradientFrom: '#1E2923',
+            backgroundGradientTo: '#08130D',
+            color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          }}
+          accessor="value"
+          backgroundColor="transparent"
+          paddingLeft="-45"
+          center={[60, 10]}
+        />
+      </View>
+  
+      <View style={styles.pieChartContainer}>
+        <Text style={styles.sectionTitle}>Total Amount by User</Text>
+        <PieChart
+          data={totalAmountByUser.map((dataPoint, index) => ({
+            name:`${dataPoint.totalAmount.toFixed(2)}\n${dataPoint.userNickName}`,
+            value: dataPoint.totalAmount,
+            color: hardcodedColors[index % hardcodedColors.length],
+          }))}
+          width={450}
+          height={200}
+          chartConfig={{
+            backgroundGradientFrom: '#1E2923',
+            backgroundGradientTo: '#08130D',
+            color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+          }}
+          paddingLeft="-45"
+          center={[60, 10]}
+          accessor="value" 
+          backgroundColor="transparent" 
+        />
+      </View>
+    </View>
+  );
+        }
 
 
 export default OverviewScreen;
 
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: Colors.primary,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    alignItems: 'center', 
+    paddingTop: 20,
 
+  },
+  sectionTitle: {
+    width: '100%',
+    color: Colors.secondary,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    paddingLeft: 10,
+
+  },
+  pieChartContainer: {
+    width: '100%',
+    alignItems: 'center', 
+    marginBottom: 20,
+
+  },
+  budgetInfo: {
+    color: Colors.secondary,
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingLeft: 10,
+  },
+  
+});

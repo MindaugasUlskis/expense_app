@@ -8,7 +8,7 @@ interface CreateListingModalProps {
     isVisible: boolean;
     onClose: () => void;
     onCreateListing: (number: number, category: string, userId: string ,roomId: string,) => void;
-    categories: string[]; // List of available categories
+    categories: string[]; 
     item: RoomData
 }
 
@@ -18,24 +18,23 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isVisible, onCl
     const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 
     const handleNumberChange = (text: string) => {
-        // Use regular expression to allow positive and negative numbers
+
         const numberRegex = /^[-+]?\d*\.?\d*$/;
         if (numberRegex.test(text)) {
-            // Remove leading '+' if present
+
             const cleanText = text.replace(/^\+/, '');
-            // If the input is a valid number, update the state.
+
             setNumber(parseFloat(cleanText));
         }
     };
     const handleCreateListing = () => {
         if (!isNaN(number) && selectedCategory && number !== 0) {
             onCreateListing(number, selectedCategory, firestoreFunctions.getCurrentUserId(),  item.id,);
-            setNumber(0); // Set the input field back to 0
+            setNumber(0);
             onClose();
         } else {
-            // Handle invalid number input (e.g., show an error message)
+
             console.log('Invalid number input');
-            // You might want to provide user feedback about invalid input
         }
     };
 
@@ -105,7 +104,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     input: {
-        width: '60%', // Adjust the width as per your preference
+        width: '60%',
         height: 40,
         borderWidth: 1,
         borderColor: '#ccc',
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 10,
         color: Colors.helper1,
-        fontSize: 18, // Increase the font size
+        fontSize: 18,
         backgroundColor: 'white',
     },
 
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
         width: '10%',
     },
     pickerContainer: {
-        width: '60%', // Adjust the width for the picker container
+        width: '60%',
         marginBottom: 10,
     },
 });
