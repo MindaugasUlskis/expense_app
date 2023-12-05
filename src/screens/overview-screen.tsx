@@ -118,7 +118,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
         <Text style={styles.sectionTitle}>Total Amount by User</Text>
         <PieChart
           data={totalAmountByUser.map((dataPoint, index) => ({
-            name:`${dataPoint.totalAmount.toFixed(2)}\n${dataPoint.userNickName}`,
+            name:`${dataPoint.totalAmount.toFixed(2)} Eur.\n${dataPoint.userNickName}`,
             value: dataPoint.totalAmount,
             color: hardcodedColors[index % hardcodedColors.length],
           }))}

@@ -10,6 +10,7 @@ import JoinRoomModal from '../ui/components/joinRoomModalProps';
 import { RootStackParamList } from './rootStackParamList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Room'>;
 const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
@@ -65,9 +66,13 @@ const HomeScreen = ({ navigation }: { navigation: ScreenNavigationProp }) => {
   const handleNavigation = (item: RoomData) => {
     navigation.navigate('Room', { item })
   }
+  const handleSignOut = async () => {
+    await auth().signOut()
+    navigation.navigate('Login')
+  }
   const renderButtons = () => (
     <View style={styles.createRoomContainer}>
-      <TouchableOpacity style={styles.roundButtonSecondary} onPress={toggleCreateRoomModal}>
+      <TouchableOpacity style={styles.roundButtonSecondary} onPress={handleSignOut}>
         <Icon name="sign-out" size={30} color={Colors.helper1} />
       </TouchableOpacity>
     </View>
