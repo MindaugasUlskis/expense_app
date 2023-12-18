@@ -7,8 +7,8 @@ import { firestoreFunctions } from '../../api/database-requests'
 interface CreateListingModalProps {
     isVisible: boolean;
     onClose: () => void;
-    onCreateListing: (number: number, category: string, userId: string ,roomId: string,) => void;
-    categories: string[]; 
+    onCreateListing: (number: number, category: string, userId: string, roomId: string,) => void;
+    categories: string[];
     item: RoomData
 }
 
@@ -17,19 +17,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isVisible, onCl
     const [number, setNumber] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 
-    const handleNumberChange = (text: string) => {
 
-        const numberRegex = /^[-+]?\d*\.?\d*$/;
-        if (numberRegex.test(text)) {
-
-            const cleanText = text.replace(/^\+/, '');
-
-            setNumber(parseFloat(cleanText));
-        }
-    };
     const handleCreateListing = () => {
-        if (!isNaN(number) && selectedCategory && number !== 0) {
-            onCreateListing(number, selectedCategory, firestoreFunctions.getCurrentUserId(),  item.id,);
+        if (!isNaN(number) && number > 0) {
+            onCreateListing(number, selectedCategory, firestoreFunctions.getCurrentUserId(), item.id,);
             setNumber(0);
             onClose();
         } else {
@@ -44,18 +35,20 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isVisible, onCl
                 <View style={styles.modalContainer}>
                     <TextInput
                         style={styles.input}
-                        value={number === undefined ? '' : number.toString()}
-                        onChangeText={handleNumberChange}
+                        value={number === 0 ? '' : number.toString()}
+                        onChangeText={(value) => {
+                            const numericValue = parseInt(value, 10);
+                            setNumber(isNaN(numericValue) ? 0 : numericValue);
+                        }}
                         keyboardType="numeric"
-                        placeholder="Number (Positive or Negative)"
                     />
                     <View style={styles.pickerContainer}>
-                    <RNPickerSelect
-                        items={categories.map(category => ({ label: category, value: category }))}
-                        onValueChange={(value: string) => setSelectedCategory(value)}
-                        value={selectedCategory}
-                        style={{inputAndroid:{color:Colors.secondary, fontWeight:'bold',elevation:10}}}
-                    />
+                        <RNPickerSelect
+                            items={categories.map(category => ({ label: category, value: category }))}
+                            onValueChange={(value: string) => setSelectedCategory(value)}
+                            value={selectedCategory}
+                            style={{ inputAndroid: { color: Colors.secondary, fontWeight: 'bold', elevation: 10 } }}
+                        />
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity

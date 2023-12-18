@@ -25,7 +25,7 @@ function ListingItem({ data, onDelete }: ListingItemProps) {
     return (
             <View style={styles.container}>
                 <View style={styles.leftColumn}>
-                    <Text style={styles.amountText}>-${data.amount}</Text>
+                    <Text style={styles.amountText}>-€{data.amount}</Text>
                     <View style={{ flexDirection: 'row', width: '100%' }}>
                         <View>
                             <Text style={styles.categoryText}>{data.category.toLowerCase()}</Text>

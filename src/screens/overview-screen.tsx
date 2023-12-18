@@ -76,10 +76,10 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
       <OverviewHeader dateCode={displayedRoom.linstingDateCode} left={handleLeft} right={handleRight} index={index} />
       <View style={{backgroundColor:Colors.helper1, width: '100%',}}> 
       <Text style={styles.budgetInfo}>
-        Total Amount Spent: ${currentExpenses.toFixed(2)}
+        Total Amount Spent:€{currentExpenses.toFixed(2)}
       </Text>
       <Text style={styles.budgetInfo}>
-        Budget: ${allBudget.toFixed(2)}
+        Budget: €{allBudget.toFixed(2)}
       </Text>
       <Text style={styles.budgetInfo}>
         Budget Spent: {percentageSpent.toFixed(2)}%
