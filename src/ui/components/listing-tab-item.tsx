@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import Colors from '../../utils/palette';
 import { ListingData, firestoreFunctions } from '../../api/database-requests';
-import { Button } from '@ant-design/react-native';
 
 interface ListingItemProps {
     data: ListingData;
