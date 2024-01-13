@@ -2,7 +2,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { RootStackParamList } from './rootStackParamList';
-import { List, InputItem, WhiteSpace } from '@ant-design/react-native';
 import { loginOrRegister } from '../utils/functions/loginOrRegister';
 import Colors from '../utils/palette';
 

@@ -5,6 +5,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInviteId } from '../utils/functions/invite-id-generator';
 import { showError } from '../utils/functions/show-error';
+import { UserCategorySpending, getUserCategorySpending } from '../utils/functions/calculateChardData';
 
 export type RoomData = {
   id: string
@@ -46,6 +47,18 @@ export type ListingData = {
   dateCode: string;
   userNickName: string;
 };
+
+export type CategoryMonth = {
+  category: string;
+  user: string;
+  amount: number;
+  date: string;
+  dateCode: string;
+  userNickName: string;
+};
+
+
+
 const checkDocumentAndUsername = async (userID: string): Promise<boolean> => {
   try {
     const collectionRef = firestore().collection('User');
@@ -247,16 +260,17 @@ export async function getRoomsByUserId(userId: string): Promise<RoomData[]> {
 
   return roomsData;
 }
-async function getListingsByRoomId(roomid: string) {
+async function getListingsByRoomId(roomid: string): Promise<ListingData[]> {
   try {
-    const roomsSnapshot = await firestore()
+    const listingsSnapshot = await firestore()
       .collection('Listings')
       .where('roomid', '==', roomid)
       .get();
-    const rooms = roomsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return rooms;
+    const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ListingData[];
+    listings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return listings;
   } catch (error) {
-    showError('Error reading listings for room ID')
+    showError('Error reading listings for room ID ');
     return [];
   }
 }
@@ -276,6 +290,22 @@ async function getListingsByRoomIdAndDateCode(roomid: string, datecode: string):
   }
 }
 
+async function getAllListingsByRoomIdAndDateCode(roomid: string): Promise<UserCategorySpending[]> {
+  try {
+    const listingsSnapshot = await firestore()
+      .collection('Listings')
+      .where('roomid', '==', roomid)
+      .get();
+    const listings = listingsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ListingData[];
+    listings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const resultArray: UserCategorySpending[] = getUserCategorySpending(listings);
+    return resultArray;
+  } catch (error) {
+    showError('Error reading listings for room ID and date code');
+    return [];
+  }
+}
+
 async function joinRoom(inviteId: string, userId: string) {
   try {
 
@@ -284,22 +314,17 @@ async function joinRoom(inviteId: string, userId: string) {
       .where('inviteId', '==', inviteId)
       .get();
 
-
     if (roomQuerySnapshot.size === 0) {
       showError('Room not found with the provided inviteId')
       throw new Error('Room not found with the provided inviteId');
     }
-
     const roomDoc = roomQuerySnapshot.docs[0];
     const roomData = roomDoc.data() as RoomData;
-
     if (roomData.userIds.includes(userId)) {
       showError('User is already a member of the room')
       throw new Error('User is already a member of the room');
     }
-
     const updatedUserIds = [...roomData.userIds, userId];
-
     await roomDoc.ref.update({
       userIds: updatedUserIds,
     });
@@ -535,7 +560,7 @@ export const firestoreFunctions = {
   createNickname,
   addNick,
   updateNickname,
-  getNicknameByUserIDSync
-
+  getNicknameByUserIDSync,
+  getAllListingsByRoomIdAndDateCode
 };
 
