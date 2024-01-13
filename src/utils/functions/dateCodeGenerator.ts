@@ -19,8 +19,7 @@ export function generateDateCode() {
       const yearMonthCode = year + paddedMonth;
   
       dateCodes.push(yearMonthCode);
-  
-      // Move to the previous month for the next iteration
+
       currentDate.setMonth(currentDate.getMonth() - 1);
     }
   

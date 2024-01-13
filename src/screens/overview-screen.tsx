@@ -92,7 +92,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
   const handleRight = async () => {
     setRoomIndex(roomIndex - 1)
   };
-  // console.log(allListings)
+
   if (allListings) {
     const test = getUserAmountSumForSpecificCategory(allListings, selectedCategory, 6);
     if (JSON.stringify(test) !== JSON.stringify(tableResults)) {
@@ -179,7 +179,6 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
                     data: item.amounts,
                     color: (opacity = 1) => hardcodedColors[index % hardcodedColors.length],
                     strokeWidth: 2,
-                    //legend: item.user
                     name: 'test'
                   })),
                 }}
@@ -190,7 +189,7 @@ const OverviewScreen = ({ route, navigation }: { route: OverviewScreenRouteProp,
                   backgroundColor: Colors.helper1,
                   backgroundGradientFrom: Colors.helper1,
                   backgroundGradientTo: Colors.helper1,
-                  decimalPlaces: 2, // optional, defaults to 2dp
+                  decimalPlaces: 2,
                   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   style: {

@@ -65,12 +65,11 @@ export function calculateSumForDateAndCategory(
     chosenDateCode: string,
     chosenCategory: string
   ): number {
-    // Filter the data based on the chosen dateCode and category
+
     const filteredData = data.filter(
       (item) => item.dateCode === chosenDateCode && item.category === chosenCategory
     );
-  
-    // Calculate the sum of the amount from the filtered data
+
     const sum = filteredData.reduce((accumulator, item) => accumulator + item.amount, 0);
   
     return sum;
@@ -79,27 +78,24 @@ export function calculateSumForDateAndCategory(
   export function getUserCategorySpending(listingData: ListingData[]): UserCategorySpending[] {
     const result: UserCategorySpending[] = [];
   
-    // Create a map to store the sum of amounts for each user and dateCode
+
     const userDateCodeMap: Map<string, Map<string, number>> = new Map();
-  
-    // Iterate through the listingData
+
     for (const data of listingData) {
       const { user, dateCode, amount } = data;
-  
-      // Initialize the userMap if it doesn't exist
+
       if (!userDateCodeMap.has(user)) {
         userDateCodeMap.set(user, new Map());
       }
-  
-      // Get the userMap for the current user
+
       const userMap = userDateCodeMap.get(user) ?? new Map();
   
-      // Update the sum of amounts for the current dateCode
+e
       
       userMap.set(dateCode, (userMap.get(dateCode) || 0) + amount);
     }
   
-    // Convert the map to an array of UserCategorySpending objects
+
     userDateCodeMap.forEach((userMap, user) => {
       userMap.forEach((amountSum, dateCode) => {
         result.push({ user, dateCode, amountSum });
@@ -113,7 +109,7 @@ export function calculateSumForDateAndCategory(
     const userAmountMap: Map<string, Map<string, number>> = new Map();
     const dateCodes = generateDateCodes(lenght)
   
-    // Iterate through the listings to calculate the sum for each user, category, and date code
+
     for (const listing of listings) {
       if (listing.category === category) {
         const { userNickName, dateCode, amount } = listing;
@@ -127,7 +123,7 @@ export function calculateSumForDateAndCategory(
       }
     }
   
-    // Convert the map to the desired array of objects format
+
     const result: UserAmountSummary = Array.from(userAmountMap.entries()).map(([user, userMap]) => ({
         user,
         amounts: dateCodes.map(dateCode => userMap.get(dateCode) || 0),
